@@ -796,32 +796,685 @@ svg.leaflet-image-layer.leaflet-interactive path {
    pid: 구글맵 place_id  (구글맵에서 보기 버튼 연동)
    ===================================================================== */
 window.GEO_DATA = {
-  meta: { center: [26.175, 127.670], zoom: 13, pinColor:"#2e9d68", accent:"#aa1166" },
-
-  landmarks: [
-    { id:"odal",    kind:"odal",    name:"오달렌터카",   color:"#A01861", lat:26.167595, lng:127.6686257, pid:"ChIJOVA6TqRp5TQRhKu5BquXkI4" },
-    { id:"airport", kind:"airport", name:"나하공항",     color:"#3470a8", lat:26.1958, lng:127.6517, pid:"" },
-    { id:"ic",      kind:"ic",      name:"고속도로 출입구", color:"#1f7a3d", lat:26.175831974562033, lng:127.66881994925065, pid:"" },
-    { id:"kokusai", kind:"kokusai", name:"국제거리",     color:"#7a59c4", lat:26.2161875, lng:127.6880625, pid:"" },
+  "meta": {
+    "center": [
+      26.175,
+      127.67
+    ],
+    "zoom": 13,
+    "pinColor": "#2e9d68",
+    "accent": "#aa1166"
+  },
+  "landmarks": [
+    {
+      "id": "odal",
+      "kind": "odal",
+      "name": "오달렌터카",
+      "color": "#A01861",
+      "lat": 26.167595,
+      "lng": 127.6686257,
+      "pid": "ChIJOVA6TqRp5TQRhKu5BquXkI4"
+    },
+    {
+      "id": "airport",
+      "kind": "airport",
+      "name": "나하공항",
+      "color": "#3470a8",
+      "lat": 26.1958,
+      "lng": 127.6517,
+      "pid": ""
+    },
+    {
+      "id": "ic",
+      "kind": "ic",
+      "name": "고속도로 출입구",
+      "color": "#1f7a3d",
+      "lat": 26.175831974562033,
+      "lng": 127.66881994925065,
+      "pid": ""
+    },
+    {
+      "id": "kokusai",
+      "kind": "kokusai",
+      "name": "국제거리",
+      "color": "#7a59c4",
+      "lat": 26.2161875,
+      "lng": 127.6880625,
+      "pid": ""
+    }
   ],
-
-  stations: [
-    { id:1,  short:"Eneos Ryuseki Energy Yamashita", pay:"both", svc:"staff", closed:"연중무휴", hours:"월~토 07:00~20:00 · 일 08:00~20:00", note:"", tag:"국제거리(나하 시내)에서 들르기 좋은 주유소", oh:[[480,1200],[420,1200],[420,1200],[420,1200],[420,1200],[420,1200],[420,1200]], lat:26.2041114, lng:127.6687604, pid:"ChIJQb2dGrtp5TQR0sm_W9Gom8g" },
-    { id:2,  short:"apollostation Oroku Kinjo SS", pay:"cash", svc:"staff", closed:"연중무휴", hours:"07:00~20:00", note:"", tag:"", oh:[[420,1200],[420,1200],[420,1200],[420,1200],[420,1200],[420,1200],[420,1200]], lat:26.2018544, lng:127.6622261, pid:"ChIJiUXXnrdp5TQRA1u4TQEgD64" },
-    { id:3,  short:"ENEOS Dr. Drive Oroku Ekimae", pay:"both", svc:"self", closed:"연중무휴", hours:"24시간", note:"", tag:"국제거리(나하 시내)에서 들르기 좋은 주유소", oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]], lat:26.1988455, lng:127.6701951, pid:"ChIJsQPAI7Bp5TQRlJD3ZHFLXc0" },
-    { id:4,  short:"JA Toyomi Self Filling Station", pay:"both", svc:"self", closed:"연중무휴", hours:"24시간", note:"", tag:"", oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]], lat:26.1866201, lng:127.6877058, pid:"ChIJWV7MOAJp5TQRvVaTs1nUKj0" },
-    { id:5,  short:"Eneos Oroku", pay:"both", svc:"self", closed:"연중무휴", hours:"24시간", note:"", tag:"", oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]], lat:26.1832896, lng:127.6558945, pid:"ChIJ189a6jlo5TQRfJze1tYXQBs" },
-    { id:6,  short:"ENEOS Express Oroku Bypass", pay:"both", svc:"self", closed:"연중무휴", hours:"24시간", note:"", tag:"", oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]], lat:26.178235, lng:127.6531734, pid:"ChIJG-nENjxo5TQR4DVzv2wVD9I" },
-    { id:7,  short:"PB Gibo Gas Station", pay:"cash", svc:"staff", closed:"일 휴무", hours:"월~토 07:00~21:00", note:"", tag:"", oh:[null,[420,1260],[420,1260],[420,1260],[420,1260],[420,1260],[420,1260]], lat:26.1827115, lng:127.6792411, pid:"ChIJaWl511Vo5TQRHs4Pnun3QrI" },
-    { id:8,  short:"PB 伊良波SS", pay:"cash", svc:"staff", closed:"일 휴무", hours:"06:00~17:00", note:"주유소 사정으로 조기 영업 종료될 수 있음", tag:"고속도로 출입구에서 가장 가까운 주유소 · 일요일 휴무 주의", oh:[null,[360,1020],[360,1020],[360,1020],[360,1020],[360,1020],[360,1020]], lat:26.1700642, lng:127.6673504, pid:"ChIJb1D1yGlo5TQRKqDSXnq5kt4" },
-    { id:9,  short:"carenex かねひでSS上田店", pay:"cash", svc:"staff", closed:"연중무휴", hours:"월~토 07:00~21:00 · 일 08:00~20:00", note:"", tag:"오달 근처 · 일요일 영업", oh:[[480,1200],[420,1260],[420,1260],[420,1260],[420,1260],[420,1260],[420,1260]], lat:26.1693001, lng:127.6776527, pid:"ChIJTxb5Xxdp5TQRZ2R5UxHePDU" },
-    { id:10, short:"carenex Family Filling Station", pay:"both", svc:"staff", closed:"일 휴무", hours:"07:00~20:00", note:"", tag:"", oh:[null,[420,1200],[420,1200],[420,1200],[420,1200],[420,1200],[420,1200]], lat:26.164731, lng:127.66384, pid:"ChIJew_MSmxo5TQRoNmcEQSbXng" },
-    { id:11, short:"Eneos Petrol Station", pay:"both", svc:"staff", closed:"연중무휴", hours:"08:00~19:00", note:"", tag:"", oh:[[480,1140],[480,1140],[480,1140],[480,1140],[480,1140],[480,1140],[480,1140]], lat:26.1584828, lng:127.6544966, pid:"ChIJd-h3YQlo5TQR9e8v4PwcXIc" },
-    { id:12, short:"ENEOS EneJet サンセール潮平SS", pay:"both", svc:"self", closed:"연중무휴", hours:"24시간", note:"", tag:"남부에서 들르기 좋은 주유소", oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]], lat:26.1502219, lng:127.6722201, pid:"ChIJiQEVbnho5TQRDHcEDvHZItE" },
-    { id:13, short:"JA-SS Kakazu", pay:"both", svc:"self", closed:"연중무휴", hours:"24시간", note:"", tag:"", oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]], lat:26.1526796, lng:127.6930794, pid:"ChIJj17Zoppo5TQRBhASs8qsSRU" },
-    { id:14, short:"Showa Shell Nishizaki Park", pay:"both", svc:"staff", closed:"일 휴무", hours:"월~금 07:00~21:00 · 토 08:00~20:00", note:"", tag:"", oh:[null,[420,1260],[420,1260],[420,1260],[420,1260],[420,1260],[480,1200]], lat:26.14522, lng:127.6688018, pid:"ChIJA3bNJdpn5TQRg9iWoXCvf6c" },
-    { id:15, short:"carenex 豊見城なかち店", pay:"both", svc:"self", closed:"화 휴무", hours:"10:00~18:00", note:"", tag:"오달 근처 · 일요일 영업", oh:[[600,1080],[600,1080],null,[600,1080],[600,1080],[600,1080],[600,1080]], lat:26.1749399, lng:127.6638479, pid:"ChIJ0emldEFo5TQRXp4j2OIGiJs" },
-  ],
+  "stations": [
+    {
+      "id": 1,
+      "short": "Eneos Ryuseki Energy Yamashita1",
+      "pay": "both",
+      "svc": "staff",
+      "closed": "연중무휴",
+      "hours": "월~토 07:00~20:00 · 일 08:00~20:00",
+      "note": "",
+      "tag": "국제거리(나하 시내)에서 들르기 좋은 주유소",
+      "oh": [
+        [
+          480,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ]
+      ],
+      "lat": 26.2041114,
+      "lng": 127.6687604,
+      "pid": "ChIJQb2dGrtp5TQR0sm_W9Gom8g"
+    },
+    {
+      "id": 2,
+      "short": "apollostation Oroku Kinjo SS",
+      "pay": "cash",
+      "svc": "staff",
+      "closed": "연중무휴",
+      "hours": "07:00~20:00",
+      "note": "",
+      "tag": "",
+      "oh": [
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ]
+      ],
+      "lat": 26.2018544,
+      "lng": 127.6622261,
+      "pid": "ChIJiUXXnrdp5TQRA1u4TQEgD64"
+    },
+    {
+      "id": 3,
+      "short": "ENEOS Dr. Drive Oroku Ekimae",
+      "pay": "both",
+      "svc": "self",
+      "closed": "연중무휴",
+      "hours": "24시간",
+      "note": "",
+      "tag": "국제거리(나하 시내)에서 들르기 좋은 주유소",
+      "oh": [
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ]
+      ],
+      "lat": 26.1988455,
+      "lng": 127.6701951,
+      "pid": "ChIJsQPAI7Bp5TQRlJD3ZHFLXc0"
+    },
+    {
+      "id": 4,
+      "short": "JA Toyomi Self Filling Station",
+      "pay": "both",
+      "svc": "self",
+      "closed": "연중무휴",
+      "hours": "24시간",
+      "note": "",
+      "tag": "",
+      "oh": [
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ]
+      ],
+      "lat": 26.1866201,
+      "lng": 127.6877058,
+      "pid": "ChIJWV7MOAJp5TQRvVaTs1nUKj0"
+    },
+    {
+      "id": 5,
+      "short": "Eneos Oroku",
+      "pay": "both",
+      "svc": "self",
+      "closed": "연중무휴",
+      "hours": "24시간",
+      "note": "",
+      "tag": "",
+      "oh": [
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ]
+      ],
+      "lat": 26.1832896,
+      "lng": 127.6558945,
+      "pid": "ChIJ189a6jlo5TQRfJze1tYXQBs"
+    },
+    {
+      "id": 6,
+      "short": "ENEOS Express Oroku Bypass",
+      "pay": "both",
+      "svc": "self",
+      "closed": "연중무휴",
+      "hours": "24시간",
+      "note": "",
+      "tag": "",
+      "oh": [
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ]
+      ],
+      "lat": 26.178235,
+      "lng": 127.6531734,
+      "pid": "ChIJG-nENjxo5TQR4DVzv2wVD9I"
+    },
+    {
+      "id": 7,
+      "short": "PB Gibo Gas Station",
+      "pay": "cash",
+      "svc": "staff",
+      "closed": "일 휴무",
+      "hours": "월~토 07:00~21:00",
+      "note": "",
+      "tag": "",
+      "oh": [
+        null,
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ]
+      ],
+      "lat": 26.1827115,
+      "lng": 127.6792411,
+      "pid": "ChIJaWl511Vo5TQRHs4Pnun3QrI"
+    },
+    {
+      "id": 8,
+      "short": "PB 伊良波SS",
+      "pay": "cash",
+      "svc": "staff",
+      "closed": "일 휴무",
+      "hours": "06:00~17:00",
+      "note": "주유소 사정으로 조기 영업 종료될 수 있음",
+      "tag": "고속도로 출입구에서 가장 가까운 주유소 · 일요일 휴무 주의",
+      "oh": [
+        null,
+        [
+          360,
+          1020
+        ],
+        [
+          360,
+          1020
+        ],
+        [
+          360,
+          1020
+        ],
+        [
+          360,
+          1020
+        ],
+        [
+          360,
+          1020
+        ],
+        [
+          360,
+          1020
+        ]
+      ],
+      "lat": 26.1700642,
+      "lng": 127.6673504,
+      "pid": "ChIJb1D1yGlo5TQRKqDSXnq5kt4"
+    },
+    {
+      "id": 9,
+      "short": "carenex かねひでSS上田店",
+      "pay": "cash",
+      "svc": "staff",
+      "closed": "연중무휴",
+      "hours": "월~토 07:00~21:00 · 일 08:00~20:00",
+      "note": "",
+      "tag": "오달 근처 · 일요일 영업",
+      "oh": [
+        [
+          480,
+          1200
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ]
+      ],
+      "lat": 26.1693001,
+      "lng": 127.6776527,
+      "pid": "ChIJTxb5Xxdp5TQRZ2R5UxHePDU"
+    },
+    {
+      "id": 10,
+      "short": "carenex Family Filling Station",
+      "pay": "both",
+      "svc": "staff",
+      "closed": "일 휴무",
+      "hours": "07:00~20:00",
+      "note": "",
+      "tag": "",
+      "oh": [
+        null,
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ],
+        [
+          420,
+          1200
+        ]
+      ],
+      "lat": 26.164731,
+      "lng": 127.66384,
+      "pid": "ChIJew_MSmxo5TQRoNmcEQSbXng"
+    },
+    {
+      "id": 11,
+      "short": "Eneos Petrol Station",
+      "pay": "both",
+      "svc": "staff",
+      "closed": "연중무휴",
+      "hours": "08:00~19:00",
+      "note": "",
+      "tag": "",
+      "oh": [
+        [
+          480,
+          1140
+        ],
+        [
+          480,
+          1140
+        ],
+        [
+          480,
+          1140
+        ],
+        [
+          480,
+          1140
+        ],
+        [
+          480,
+          1140
+        ],
+        [
+          480,
+          1140
+        ],
+        [
+          480,
+          1140
+        ]
+      ],
+      "lat": 26.1584828,
+      "lng": 127.6544966,
+      "pid": "ChIJd-h3YQlo5TQR9e8v4PwcXIc"
+    },
+    {
+      "id": 12,
+      "short": "ENEOS EneJet サンセール潮平SS",
+      "pay": "both",
+      "svc": "self",
+      "closed": "연중무휴",
+      "hours": "24시간",
+      "note": "",
+      "tag": "남부에서 들르기 좋은 주유소",
+      "oh": [
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ]
+      ],
+      "lat": 26.1502219,
+      "lng": 127.6722201,
+      "pid": "ChIJiQEVbnho5TQRDHcEDvHZItE"
+    },
+    {
+      "id": 13,
+      "short": "JA-SS Kakazu",
+      "pay": "both",
+      "svc": "self",
+      "closed": "연중무휴",
+      "hours": "24시간",
+      "note": "",
+      "tag": "",
+      "oh": [
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ],
+        [
+          0,
+          1440
+        ]
+      ],
+      "lat": 26.1526796,
+      "lng": 127.6930794,
+      "pid": "ChIJj17Zoppo5TQRBhASs8qsSRU"
+    },
+    {
+      "id": 14,
+      "short": "Showa Shell Nishizaki Park",
+      "pay": "both",
+      "svc": "staff",
+      "closed": "일 휴무",
+      "hours": "월~금 07:00~21:00 · 토 08:00~20:00",
+      "note": "",
+      "tag": "",
+      "oh": [
+        null,
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          420,
+          1260
+        ],
+        [
+          480,
+          1200
+        ]
+      ],
+      "lat": 26.14522,
+      "lng": 127.6688018,
+      "pid": "ChIJA3bNJdpn5TQRg9iWoXCvf6c"
+    },
+    {
+      "id": 15,
+      "short": "carenex 豊見城なかち店",
+      "pay": "both",
+      "svc": "self",
+      "closed": "화 휴무",
+      "hours": "10:00~18:00",
+      "note": "",
+      "tag": "오달 근처 · 일요일 영업",
+      "oh": [
+        [
+          600,
+          1080
+        ],
+        [
+          600,
+          1080
+        ],
+        null,
+        [
+          600,
+          1080
+        ],
+        [
+          600,
+          1080
+        ],
+        [
+          600,
+          1080
+        ],
+        [
+          600,
+          1080
+        ]
+      ],
+      "lat": 26.1749399,
+      "lng": 127.6638479,
+      "pid": "ChIJ0emldEFo5TQRXp4j2OIGiJs"
+    }
+  ]
 };
 
 const D = window.GEO_DATA;
