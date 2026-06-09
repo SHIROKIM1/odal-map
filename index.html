@@ -60,6 +60,9 @@
   .leaflet-tooltip.nmtip{background:#3f4751;color:#fff;border:none;border-radius:9px;font-weight:600;font-size:12px;padding:6px 10px;box-shadow:0 2px 8px rgba(0,0,0,.35);cursor:pointer;white-space:normal;width:150px;text-align:left;}
   .leaflet-tooltip.nmtip::before{border-top-color:#3f4751;}
   .nmtip .tt-nm{font-weight:800;font-size:12.5px;line-height:1.28;}
+  .nmtip .nm-full{display:none;}                 /* 평소엔 풀네임 숨김 */
+  .nmtip.sel .nm-short{display:none;}            /* 선택 시 짧은이름 숨기고 */
+  .nmtip.sel .nm-full{display:inline;}           /* 풀네임 전체 표시 */
   .nmtip .tt-sub{font-size:11px;font-weight:700;margin-top:3px;opacity:.96;}
   .nmtip .tt-cash{color:#ffcf6b;} .nmtip .tt-closed{color:#ffb3b3;}
   .nmtip .tt-tag{font-size:10.5px;font-weight:700;color:#ffd9ec;margin-top:2px;line-height:1.32;}
@@ -1013,7 +1016,7 @@ D.stations.forEach(s=>{
   const svcTxt = s.svc==="self" ? '셀프' : '직원 대응';
   const noteL = s.note ? `<div class="tt-line">${s.note}</div>` : '';
   const tagL = s.tag ? `<div class="tt-tag">${s.tag}</div>` : '';
-  const ttHtml = `<div class="tt-nm">${nl(mapLabel(s))}</div>`
+  const ttHtml = `<div class="tt-nm"><span class="nm-short">${nl(mapLabel(s))}</span><span class="nm-full">${nl(s.short)}</span></div>`
     + `<div class="tt-sub">${payL} · ${closedL}</div>`
     + `<div class="tt-more">${tagL}<div class="tt-line">${svcTxt} · ${s.hours}</div>${noteL}`
     + `<a class="tt-gmap" href="${gmapUrl(s)}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a></div>`;
