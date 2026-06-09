@@ -928,6 +928,7 @@ panel.innerHTML =
   +   `<div class="ptop">`
   +     `<div class="fbar" id="fbar">`
   +       `<button class="fchip" id="fopen">${CLOCKSM}영업중</button>`
+  +       `<button class="fchip" id="fnear">${PINW}가까운순</button>`
   +       `<button class="fchip" id="fcard">카드 가능</button>`
   +       `<button class="fchip" data-g="svc" data-v="self">셀프</button>`
   +       `<button class="fchip" data-g="svc" data-v="staff">직원 대응</button>`
@@ -1057,6 +1058,7 @@ const fbar = panel.querySelector("#fbar");
 fbar.addEventListener("click", e=>{
   const b = e.target.closest("button"); if(!b) return;
   if(b.id==="fopen"){ F.open=!F.open; b.classList.toggle("on",F.open); renderList(); return; }
+  if(b.id==="fnear"){ doLocate(); return; }   /* 가까운순: 내 위치 파악 후 거리순 정렬(토글) */
   if(b.id==="fcard"){ F.card=!F.card; b.classList.toggle("on",F.card); renderList(); return; }   /* 카드 가능 단일 토글 */
   const g=b.dataset.g, v=b.dataset.v; if(!g) return;
   const was = b.classList.contains("on");
@@ -1065,14 +1067,19 @@ fbar.addEventListener("click", e=>{
   renderList();
 });
 
-function doLocate(btn){
-  if(F.sort){ F.sort=false; if(btn) btn.classList.remove("on"); renderList(); return; }
+/* 거리순 정렬 상태를 필터 칩(#fnear)과 지도 '내 위치' 버튼에 함께 반영 */
+function reflectSort(){
+  const nf = document.getElementById("fnear"); if(nf) nf.classList.toggle("on", F.sort);
+  const mb = document.querySelector(".mybtn");  if(mb) mb.classList.toggle("on", F.sort);
+}
+function doLocate(){
+  if(F.sort){ F.sort=false; reflectSort(); renderList(); return; }   /* 다시 누르면 거리순 해제 */
   if(!navigator.geolocation){ note("이 브라우저에서는 위치 기능을 사용할 수 없어요"); return; }
   navigator.geolocation.getCurrentPosition(function(pos){
     userLL=[pos.coords.latitude, pos.coords.longitude];
     if(userMarker){ userMarker.setLatLng(userLL); }
     else { userMarker=L.marker(userLL,{draggable:false,icon:L.divIcon({className:"",html:'<div class="meDot"></div>',iconSize:[18,18],iconAnchor:[9,9]})}).addTo(map).bindTooltip("내 위치",{permanent:false,direction:"top",className:"lmtip me"}); }
-    F.sort=true; if(btn) btn.classList.add("on"); renderList();
+    F.sort=true; reflectSort(); renderList();   /* 기존 순서 무시 → 가까운순 정렬 */
     try{ map.setView(userLL, 14); }catch(e){}
   }, function(){ note("위치를 가져오지 못했어요. 브라우저 위치 권한을 확인해 주세요 (HTTPS에서만 동작)"); }, { enableHighAccuracy:true, timeout:8000, maximumAge:60000 });
 }
