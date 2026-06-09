@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ODAL 지정 주유소</title>
+<title>ODAL 근처 주유소</title>
 <!-- Leaflet 1.9.4 (CDN) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -148,7 +148,7 @@
 </head>
 <body>
 <div id="wrap">
-  <div id="topbar"><div class="tb-brand" id="tbBrand"><span class="bdot"></span><span id="tbText">ODAL 지정 주유소</span></div><button id="menuBtn" class="tb-menu" aria-label="메뉴">&#9776;</button></div>
+  <div id="topbar"><div class="tb-brand" id="tbBrand"><span class="bdot"></span><span id="tbText">ODAL 근처 주유소</span></div><button id="menuBtn" class="tb-menu" aria-label="메뉴">&#9776;</button></div>
   <div id="body">
     <div id="map"></div>
     <div id="panel"></div>
@@ -167,7 +167,7 @@ window.GEO_DATA = {
     "zoom": 13,
     "pinColor": "#2e9d68",
     "accent": "#aa1166",
-    "brand": "ODAL 지정 주유소",
+    "brand": "ODAL 근처 주유소",
     "menu": [
       {
         "label": "오달렌터카 구글맵",
@@ -1124,7 +1124,7 @@ D.landmarks.forEach(l=>{
 /* 상단바 + 드로어(메뉴) */
 (function(){
   const brand = document.getElementById("tbText");
-  if(brand) brand.textContent = (D.meta && D.meta.brand) || "ODAL 지정 주유소";
+  if(brand) brand.textContent = (D.meta && D.meta.brand) || "ODAL 근처 주유소";
   const items = document.getElementById("drItems");
   const menu = (D.meta && D.meta.menu) || [];
   if(items){

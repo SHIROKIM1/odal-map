@@ -70,27 +70,10 @@ details summary{cursor:pointer;font-size:13px;font-weight:800;color:#5b6570;marg
     <div><div class="kick">ODAL ADMIN</div><h1>주유소 약도 관리자</h1></div>
     <div class="sp"></div>
     <button class="btn pri" id="btnsave">💾 저장</button>
-    <button class="btn gh" id="btnconn">GitHub 연결</button>
     <span class="msg" id="msg"></span>
   </header>
   <div id="body">
     <div id="left">
-
-      <div class="panel conn" id="conn" style="display:none;">
-        <div class="sec" style="margin-top:0;">GitHub 연결 (이 브라우저에만 저장됨)</div>
-        <div class="grid">
-          <div class="f"><label>사용자/조직 (owner)</label><input id="gh_owner"></div>
-          <div class="f"><label>저장소 (repo)</label><input id="gh_repo"></div>
-          <div class="f"><label>브랜치</label><input id="gh_branch"></div>
-          <div class="f"><label>액세스 토큰 (Personal Access Token)</label><input id="gh_token" type="password" placeholder="github_pat_..."></div>
-        </div>
-        <div class="arow" style="margin-top:8px;">
-          <button class="btn pri sm" id="gh_save">연결 저장</button>
-          <button class="btn sm" id="gh_clear">토큰 삭제</button>
-          <span style="margin-left:8px;font-size:12px;"><span class="okdot" id="ghdot"></span><span id="ghstate"></span></span>
-        </div>
-        <div class="warn">⚠ 토큰은 이 저장소의 ‘비밀번호’와 같아요. 이 화면(내 브라우저)에만 저장되고 파일/깃허브에는 올라가지 않습니다. 절대 남에게 공유하지 마세요. 토큰은 <b>Fine-grained</b>로 <b>이 저장소 1개</b>에만, 권한은 <b>Contents: Read and write</b>로 만드는 걸 권장합니다.</div>
-      </div>
 
       <div class="sec">지도 색상</div>
       <div class="panel" id="colors"></div>
@@ -108,7 +91,7 @@ details summary{cursor:pointer;font-size:13px;font-weight:800;color:#5b6570;marg
 
       <div class="sec">다른 웹사이트에 삽입 (iframe)</div>
       <div class="panel">
-        <div class="help" style="margin:0 0 10px;">아래 버튼을 누르면 이 지도를 다른 홈페이지·블로그·게시판에 넣을 수 있는 코드가 복사됩니다. 붙여넣은 곳의 <b>가로폭에 자동으로 맞춰지고</b>, 모바일에서는 세로가 적당히 조절돼요. (GitHub Pages 주소 기준으로 생성됩니다)</div>
+        <div class="help" style="margin:0 0 10px;">아래 버튼을 누르면 이 지도를 다른 홈페이지·블로그·게시판에 넣을 수 있는 코드가 복사됩니다. 붙여넣은 곳의 <b>가로폭에 자동으로 맞춰지고</b>, 모바일에서는 세로가 적당히 조절돼요. (현재 접속한 서버 주소 기준으로 생성됩니다)</div>
         <button class="btn pri" id="cpembed" style="width:100%;">📋 게시판용 코드 복사</button>
       </div>
 
@@ -132,7 +115,7 @@ details summary{cursor:pointer;font-size:13px;font-weight:800;color:#5b6570;marg
 <script>
 window.GEO_DATA = {
   meta: { center: [26.175, 127.670], zoom: 13, pinColor:"#2e9d68", accent:"#aa1166",
-    brand:"ODAL 지정 주유소",
+    brand:"ODAL 근처 주유소 안내",
     menu:[
       { label:"오달렌터카 구글맵", type:"link", value:"https://www.google.com/maps/search/?api=1&query=26.167595,127.6686257&query_place_id=ChIJOVA6TqRp5TQRhKu5BquXkI4" },
       { label:"긴급 연락처", type:"tel", value:"+82-70-7017-7057" }
@@ -169,7 +152,7 @@ window.GEO_DATA = {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ODAL 지정 주유소</title>
+<title>ODAL 근처 주유소</title>
 <!-- Leaflet 1.9.4 (CDN) -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"><\/script>
@@ -314,7 +297,7 @@ window.GEO_DATA = {
 </head>
 <body>
 <div id="wrap">
-  <div id="topbar"><div class="tb-brand" id="tbBrand"><span class="bdot"></span><span id="tbText">ODAL 지정 주유소</span></div><button id="menuBtn" class="tb-menu" aria-label="메뉴">&#9776;</button></div>
+  <div id="topbar"><div class="tb-brand" id="tbBrand"><span class="bdot"></span><span id="tbText">ODAL 근처 주유소</span></div><button id="menuBtn" class="tb-menu" aria-label="메뉴">&#9776;</button></div>
   <div id="body">
     <div id="map"></div>
     <div id="panel"></div>
@@ -597,7 +580,7 @@ D.landmarks.forEach(l=>{
 /* 상단바 + 드로어(메뉴) */
 (function(){
   const brand = document.getElementById("tbText");
-  if(brand) brand.textContent = (D.meta && D.meta.brand) || "ODAL 지정 주유소";
+  if(brand) brand.textContent = (D.meta && D.meta.brand) || "ODAL 근처 주유소";
   const items = document.getElementById("drItems");
   const menu = (D.meta && D.meta.menu) || [];
   if(items){
@@ -659,7 +642,15 @@ function fitAll(){
   const pts = [];
   D.stations.forEach(s=> pts.push(markers[s.id].getLatLng()));
   D.landmarks.forEach(l=> pts.push(lmark[l.id].getLatLng()));
-  if(pts.length) map.fitBounds(L.latLngBounds(pts), { padding:[45,45], maxZoom:15 });
+  if(pts.length){
+    const panelEl = document.getElementById("panel");
+    if(panelEl && panelEl.classList.contains("sheet")){
+      /* 모바일 첫 화면: 좌·하단 여백을 더 크게 → 핀 묶음이 살짝 오른쪽·위로 치우침 */
+      map.fitBounds(L.latLngBounds(pts), { paddingTopLeft:[58,24], paddingBottomRight:[22,86], maxZoom:15, animate:false });
+    } else {
+      map.fitBounds(L.latLngBounds(pts), { padding:[45,45], maxZoom:15, animate:false });
+    }
+  }
   applyZoomMode();
 }
 /* 모바일에서 지도가 잘못된 크기로 초기화되는 문제(오른쪽 미표시·클릭 어긋남·과도 줌) 해결 */
@@ -684,7 +675,7 @@ let S = JSON.parse(JSON.stringify(window.GEO_DATA));
 S.meta = S.meta || {center:[26.175,127.67], zoom:13};
 if(!S.meta.pinColor) S.meta.pinColor='#2e9d68';
 if(!S.meta.accent) S.meta.accent='#aa1166';
-if(!S.meta.brand) S.meta.brand='ODAL 지정 주유소';
+if(!S.meta.brand) S.meta.brand='ODAL 근처 주유소 안내';
 if(!Array.isArray(S.meta.menu)) S.meta.menu=[{label:'오달렌터카 구글맵',type:'link',value:'https://www.google.com/maps/search/?api=1&query=26.167595,127.6686257&query_place_id=ChIJOVA6TqRp5TQRhKu5BquXkI4'},{label:'긴급 연락처',type:'tel',value:'+82-70-7017-7057'}];
 S.landmarks.forEach(l=>{ if(!l.color) l.color=DEFC[l.kind]||'#7a59c4'; if(l.pid==null) l.pid=''; if(!l.id) l.id='lm'+Math.random().toString(36).slice(2,8); });
 
@@ -779,7 +770,7 @@ function renderLandmarks(){
 }
 function renderMenu(){
   const box=document.getElementById('menued'); if(!box) return; box.innerHTML='';
-  box.appendChild(field('상단바 제목(brand)', S.meta.brand||'', v=>{ S.meta.brand=v; }, true, {placeholder:'예: ODAL 지정 주유소'}));
+  box.appendChild(field('상단바 제목(brand)', S.meta.brand||'', v=>{ S.meta.brand=v; }, true, {placeholder:'예: ODAL 근처 주유소 안내'}));
   if(!Array.isArray(S.meta.menu)) S.meta.menu=[];
   S.meta.menu.forEach((mi,idx)=>{
     const card=el('div','acard'); const top=el('div','arow');
@@ -823,60 +814,43 @@ document.getElementById('addst').onclick=()=>{ const c=map.getCenter(); S.statio
 document.getElementById('addlm').onclick=()=>{ const c=map.getCenter(); S.landmarks.push({id:'lm'+Date.now(),kind:'label',name:'새 장소',color:'#7a59c4',lat:+c.lat.toFixed(7),lng:+c.lng.toFixed(7),pid:''}); render(); elLm.lastChild.scrollIntoView({behavior:'smooth',block:'center'}); };
 
 // ===== 게시판용(iframe) 코드 =====
-function embedUrl(){ const c=ghCfg(); const owner=(c.owner||'SHIROKIM1').toLowerCase(); const repo=c.repo||'odal-map'; return 'https://'+owner+'.github.io/'+repo+'/'; }
-function embedCode(){ const u=embedUrl(); return '<div style="position:relative;width:100%;max-width:100%;margin:12px auto;"><iframe src="'+u+'" title="ODAL 지정 주유소" loading="lazy" allow="geolocation" scrolling="no" style="width:100%;min-width:100%;height:78vh;min-height:520px;max-height:760px;border:0;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.12);display:block;"></iframe></div>'; }
+function embedUrl(){ return window.location.origin + '/'; }   /* 현재 접속한(아마존) 서버 주소 기준 */
+function embedCode(){ const u=embedUrl(); return '<div style="position:relative;width:100%;max-width:100%;margin:12px auto;"><iframe src="'+u+'" title="ODAL 근처 주유소" loading="lazy" allow="geolocation" scrolling="no" style="width:100%;min-width:100%;height:78vh;min-height:520px;max-height:760px;border:0;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.12);display:block;"></iframe></div>'; }
 const _cpembed=document.getElementById('cpembed');
 if(_cpembed) _cpembed.onclick=async()=>{ const t=embedCode(); let ok=true; try{ await navigator.clipboard.writeText(t); }catch(e){ try{ const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }catch(e2){ ok=false; prompt('아래 코드를 복사하세요', t); } } if(ok){ note('\u2705 \uAC8C\uC2DC\uD310\uC6A9 \uCF54\uB4DC\uAC00 \uBCF5\uC0AC\uB418\uC5C8\uC5B4\uC694'); const o=_cpembed.textContent; _cpembed.textContent='\u2705 \uBCF5\uC0AC\uB428!'; _cpembed.disabled=true; setTimeout(()=>{ _cpembed.textContent=o; _cpembed.disabled=false; }, 1600); } };
 
-// ===== GitHub 라이브 저장 =====
-const GHKEY='odalgh';
-function ghCfg(){ try{return JSON.parse(localStorage.getItem(GHKEY)||'{}');}catch(e){return {};} }
-function ghSet(c){ try{localStorage.setItem(GHKEY,JSON.stringify(c));}catch(e){} }
-function b64(s){ const bytes=new TextEncoder().encode(s); let bin=''; const ch=0x8000; for(let i=0;i<bytes.length;i+=ch){ bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+ch)); } return btoa(bin); }
-function ghStatus(){ const c=ghCfg(); const ok=!!(c.token&&c.owner&&c.repo); document.getElementById('ghdot').className='okdot'+(ok?' on':''); document.getElementById('ghstate').textContent= ok ? ('연결됨: '+c.owner+'/'+c.repo+' ('+(c.branch||'main')+')') : '미연결'; }
-const conn=document.getElementById('conn');
-function openConn(){ conn.style.display='block'; conn.scrollIntoView({behavior:'smooth',block:'start'}); }
-document.getElementById('btnconn').onclick=()=>{ conn.style.display = conn.style.display==='none'?'block':'none'; };
-(function initConn(){ const c=ghCfg();
-  const o=document.getElementById('gh_owner'), r=document.getElementById('gh_repo'), b=document.getElementById('gh_branch'), t=document.getElementById('gh_token');
-  o.value=c.owner||'SHIROKIM1'; r.value=c.repo||'odal-map'; b.value=c.branch||'main'; t.value=c.token||'';
-  document.getElementById('gh_save').onclick=()=>{ ghSet({owner:o.value.trim(),repo:r.value.trim(),branch:(b.value.trim()||'main'),token:t.value.trim(),path:'index.html'}); ghStatus(); note('GitHub 연결정보 저장됨 (이 브라우저에만 보관)'); conn.style.display='none'; };
-  document.getElementById('gh_clear').onclick=()=>{ localStorage.removeItem(GHKEY); t.value=''; ghStatus(); note('토큰 삭제됨'); };
-  ghStatus();
-})();
+// ===== 자체 서버(아마존) 저장/불러오기 =====
+const API = '/api/data';                                  // 같은 서버의 데이터 API
+let ADMIN_TOKEN = localStorage.getItem('odal_admin_token') || '';
+function setToken(t){ ADMIN_TOKEN = t || ''; try{ localStorage.setItem('odal_admin_token', ADMIN_TOKEN); }catch(e){} }
+
+// 저장: 편집 내용(S)을 서버에 저장 → 고객 페이지가 새로고침 시 즉시 최신 데이터 반영
 async function liveSave(){
-  const c=ghCfg(); if(!c.token||!c.owner||!c.repo){ alert('먼저 ‘GitHub 연결’ 버튼에서 정보를 저장하세요.'); openConn(); return; }
-  const branch=c.branch||'main', path=c.path||'index.html';
-  const base='https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+path;
-  const H={Authorization:'Bearer '+c.token,Accept:'application/vnd.github+json'};
-  note('저장 중…'); let sha=null;
-  try{ const g=await fetch(base+'?ref='+encodeURIComponent(branch),{headers:H}); if(g.ok){ sha=(await g.json()).sha; } else if(g.status===401){ alert('토큰이 올바르지 않거나 만료됐어요. GitHub 연결에서 다시 입력하세요.'); return; } else if(g.status!==404){ throw new Error(g.status+' '+(await g.text())); } }
-  catch(e){ alert('연결 확인 실패: '+e.message); return; }
-  const body={message:'관리자에서 지도 업데이트',content:b64(buildMapHTML()),branch:branch}; if(sha)body.sha=sha;
-  try{ const p=await fetch(base,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),body:JSON.stringify(body)});
-    if(p.ok){ note('✅ 라이브 사이트에 저장 완료! 1~2분 뒤 반영됩니다'); }
-    else { alert('저장 실패 ('+p.status+')\n'+(await p.text())); } }
-  catch(e){ alert('저장 실패: '+e.message); }
+  if(!ADMIN_TOKEN){ const t = prompt('관리자 저장 비밀번호를 입력하세요'); if(!t) return; setToken(t.trim()); }
+  note('저장 중…');
+  try{
+    const res = await fetch(API, { method:'POST', headers:{ 'Content-Type':'application/json', 'x-admin-token':ADMIN_TOKEN }, body: JSON.stringify(S) });
+    if(res.status===401){ setToken(''); note('비밀번호가 올바르지 않아요. 다시 시도하세요'); return; }
+    if(!res.ok) throw new Error(res.status+' '+(await res.text()));
+    note('\u2705 저장 완료! 고객 페이지에 바로 반영됩니다');
+  }catch(e){ note('저장 실패: '+e.message); }
 }
-document.getElementById('btnsave').onclick=liveSave;
+document.getElementById('btnsave').onclick = liveSave;
 
 render();
 
-/* 시작 시 라이브 사이트(index.html)의 최신 데이터를 불러와 관리자에 반영 (새로고침해도 기본값으로 안 돌아감) */
+// 시작 시 서버의 최신 데이터를 불러와 관리자에 반영 (새로고침해도 기본값으로 안 돌아감)
 async function loadLatest(){
   try{
-    const res=await fetch('index.html?cb='+Date.now(),{cache:'no-store'});
+    const res = await fetch(API+'?cb='+Date.now(), { cache:'no-store' });
     if(!res.ok) return;
-    const txt=await res.text();
-    const mm=txt.match(/window\.GEO_DATA\s*=\s*(\{[\s\S]*?\n\});/);
-    if(!mm) return;
-    let data; try{ data=JSON.parse(mm[1]); }catch(e){ try{ data=Function('return ('+mm[1]+')')(); }catch(e2){ return; } }
-    if(!data||!data.stations||!data.stations.length) return;
-    S=data; S.meta=S.meta||{center:[26.175,127.67],zoom:13};
-    if(!S.meta.pinColor)S.meta.pinColor='#2e9d68'; if(!S.meta.accent)S.meta.accent='#aa1166';
-    if(!S.meta.brand)S.meta.brand='ODAL 지정 주유소'; if(!Array.isArray(S.meta.menu))S.meta.menu=[];
-    S.landmarks.forEach(l=>{ if(!l.color)l.color=DEFC[l.kind]||'#7a59c4'; if(l.pid==null)l.pid=''; if(!l.id)l.id='lm'+Math.random().toString(36).slice(2,8); });
-    render(); note('라이브 사이트의 최신 내용을 불러왔어요');
+    const data = await res.json();
+    if(!data || !data.stations || !data.stations.length) return;
+    S = data; S.meta = S.meta || {center:[26.175,127.67], zoom:13};
+    if(!S.meta.pinColor) S.meta.pinColor='#2e9d68'; if(!S.meta.accent) S.meta.accent='#aa1166';
+    if(!S.meta.brand) S.meta.brand='ODAL 근처 주유소'; if(!Array.isArray(S.meta.menu)) S.meta.menu=[];
+    S.landmarks.forEach(l=>{ if(!l.color) l.color=DEFC[l.kind]||'#7a59c4'; if(l.pid==null) l.pid=''; if(!l.id) l.id='lm'+Math.random().toString(36).slice(2,8); });
+    render(); note('서버의 최신 내용을 불러왔어요');
   }catch(e){}
 }
 loadLatest();
