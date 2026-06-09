@@ -216,16 +216,13 @@ window.GEO_DATA = {
   .nmtip.sel .tt-more{display:block;margin-top:6px;}
   .nmtip .tt-line{font-size:11px;font-weight:500;line-height:1.4;margin-top:3px;opacity:.96;}
   .nmtip .tt-gmap{display:flex;justify-content:center;align-items:center;gap:5px;margin-top:8px;font-size:11.5px;font-weight:800;white-space:nowrap;color:#1a73e8;background:#fff;border-radius:7px;padding:7px 8px;text-decoration:none;}
-  .leaflet-tooltip.nmtip.hot,.leaflet-tooltip.nmtip.sel{background:var(--accent);}
-  .leaflet-tooltip.nmtip.hot::before,.leaflet-tooltip.nmtip.sel::before{border-top-color:var(--accent);}
-  /* 선택 시: 뾰족한 화살표 제거 → 네모 박스 */
+  /* 선택 표시: 배경/폰트 서식은 그대로 두고 마젠타 '테두리'로만 강조 */
+  .leaflet-tooltip.nmtip.sel{border:2px solid var(--accent);box-shadow:0 0 0 3px rgba(170,17,102,.22),0 6px 18px rgba(0,0,0,.45);}
   .leaflet-tooltip.nmtip.sel:before{display:none !important;}
-  .leaflet-tooltip.nmtip.sel{box-shadow:0 4px 16px rgba(170,17,102,.4);}
-  .nmtip.hot .tt-tag,.nmtip.sel .tt-tag,.nmtip.hot .tt-cash,.nmtip.sel .tt-cash,.nmtip.hot .tt-closed,.nmtip.sel .tt-closed{color:#fff;}
 
-  /* 줌아웃 시 핀만 (라벨 숨김), 선택/호버는 유지 */
+  /* 줌아웃 시 핀만 (라벨 숨김), 선택된 것만 유지 */
   .pins-only .leaflet-tooltip.nmtip{display:none;}
-  .pins-only .leaflet-tooltip.nmtip.sel,.pins-only .leaflet-tooltip.nmtip.hot{display:block;}
+  .pins-only .leaflet-tooltip.nmtip.sel{display:block;}
 
   /* 패널 상단 고정(필터) — 한 줄, 목록과 틈 없이 */
   .ptop{position:sticky;top:0;z-index:20;background:var(--panel);padding:10px 12px 8px;}
@@ -358,6 +355,14 @@ const LocateCtl = L.Control.extend({ options:{position:"bottomright"}, onAdd:fun
 map.addControl(new LocateCtl());
 
 /* 정보 카드 HTML */
+/* 지도 핀 위 이름표용 짧은 라벨: s.label 이 있으면 그걸, 없으면 정식명에서
+   ／ / ( （ 앞부분만 잘라 쓰고, 그래도 길면 18자에서 줄임 (긴 정식명이 지도를 덮는 문제 방지) */
+function mapLabel(s){
+  if(s.label) return s.label;
+  let t = String(s.short||"").split(/[／/(（]/)[0].trim();
+  if(t.length > 18) t = t.slice(0,18).trim() + "…";
+  return t;
+}
 function cardHTML(s){
   const pay = s.pay==="cash" ? '<span class="chip c-cash">현금 ONLY</span>' : '<span class="chip c-both">현금·카드</span>';
   const svc = s.svc==="self" ? '<span class="chip c-self">셀프</span>' : '<span class="chip c-staff">직원 대응</span>';
@@ -396,7 +401,10 @@ const listEl  = panel.querySelector("#stationList");
 
 let selectedId = null;
 
+/* 마우스 호버가 있는 기기에서만 hot(강조) 적용. 터치 기기는 mouseout 이 안 떠서 hot 이 박히므로 끔 */
+const HOVER = !!(window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches);
 function setHot(id, on){
+  if(!HOVER) return;
   const el = markers[id].getElement();
   if(el){ const d=el.querySelector(".pin"); if(d) d.classList.toggle("hot", on); }
   const tt = markers[id].getTooltip();
@@ -461,7 +469,7 @@ D.stations.forEach(s=>{
   const svcTxt = s.svc==="self" ? '셀프' : '직원 대응';
   const noteL = s.note ? `<div class="tt-line">${s.note}</div>` : '';
   const tagL = s.tag ? `<div class="tt-tag">${s.tag}</div>` : '';
-  const ttHtml = `<div class="tt-nm">${nl(s.short)}</div>`
+  const ttHtml = `<div class="tt-nm">${nl(mapLabel(s))}</div>`
     + `<div class="tt-sub">${payL} · ${closedL}</div>`
     + `<div class="tt-more">${tagL}<div class="tt-line">${svcTxt} · ${s.hours}</div>${noteL}`
     + `<a class="tt-gmap" href="${gmapUrl(s)}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a></div>`;
