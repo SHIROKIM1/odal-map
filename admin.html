@@ -755,12 +755,16 @@ details summary{cursor:pointer;font-size:13px;font-weight:800;color:#5b6570;marg
       <div class="sec">지도 색상</div>
       <div class="panel" id="colors"></div>
 
+      <div class="sec">상단바 · 메뉴 (모바일 우측 ☰ 메뉴)</div>
+      <div class="panel" id="menued"></div>
+
       <div class="sec">주유소</div>
       <div id="list"></div>
       <button class="btn" id="addst" style="width:100%;margin-bottom:16px;">＋ 주유소 추가</button>
 
       <div class="sec">랜드마크 (오달렌터카 · 공항 · 고속도로 · 국제거리)</div>
       <div id="lmlist"></div>
+      <button class="btn" id="addlm" style="width:100%;margin-bottom:16px;">＋ 랜드마크 추가</button>
 
       <details style="margin-top:6px;">
         <summary>백업 · 수동 (선택)</summary>
@@ -787,7 +791,12 @@ details summary{cursor:pointer;font-size:13px;font-weight:800;color:#5b6570;marg
 </script>
 <script>
 window.GEO_DATA = {
-  meta: { center: [26.175, 127.670], zoom: 13, pinColor:"#2e9d68", accent:"#aa1166" },
+  meta: { center: [26.175, 127.670], zoom: 13, pinColor:"#2e9d68", accent:"#aa1166",
+    brand:"ODAL 지정 주유소 안내",
+    menu:[
+      { label:"오달렌터카 구글맵", type:"link", value:"https://www.google.com/maps/search/?api=1&query=26.167595,127.6686257&query_place_id=ChIJOVA6TqRp5TQRhKu5BquXkI4" },
+      { label:"긴급 연락처", type:"tel", value:"+82-70-7017-7057" }
+    ] },
 
   landmarks: [
     { id:"odal",    kind:"odal",    name:"오달렌터카",   color:"#A01861", lat:26.167595, lng:127.6686257, pid:"ChIJOVA6TqRp5TQRhKu5BquXkI4" },
@@ -1496,7 +1505,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
   header .sub{font-size:12px;color:#5b6570;margin-top:1px;}
   #body{flex:1;display:flex;min-height:0;}
   #map{flex:1;min-width:0;}
-  #panel{width:366px;flex:none;overflow-y:auto;background:#f7f8f6;border-left:1px solid #e6e9ec;padding:13px;}
+  #panel{width:366px;flex:none;background:#f7f8f6;border-left:1px solid #e6e9ec;display:flex;flex-direction:column;min-height:0;}
+  #sheetHandle{display:none;}
+  #sheetScroll{flex:1;overflow-y:auto;padding:13px;}
 
   /* 지도 핀 — 색상 통일 */
   .pin{width:17px;height:17px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.45);transition:transform .12s;background:var(--pin);}
@@ -1526,8 +1537,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .nmtip .tt-nm{font-weight:700;font-size:12.5px;line-height:1.3;}
   .nmtip .tt-sub{font-size:11px;font-weight:600;margin-top:2px;}
   .nmtip .tt-cash{color:#ffcf6b;font-weight:700;} .nmtip .tt-closed{color:#ffb0b0;font-weight:700;}
-  .nmtip.hot .tt-cash,.nmtip.sel .tt-cash,.nmtip.hot .tt-closed,.nmtip.sel .tt-closed{color:#fff;}
   .koklabel{background:var(--kok);color:#fff;font-weight:800;font-size:12.5px;padding:5px 11px;border-radius:7px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.3);text-align:center;}
+  /* 랜드마크 라벨(자동 너비) */
+  .leaflet-tooltip.lmpill{color:#fff;font-weight:800;font-size:13px;padding:5px 11px;border-radius:8px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.3);border:none;z-index:650;}
+  .leaflet-tooltip.lmpill::before{display:none;}
+  .leaflet-tooltip.lmtip{white-space:nowrap;}
+  .lmtip .lmpill-nm,.lmpill .lmpill-nm{display:block;white-space:nowrap;}
+  .lmtip .tt-gmap,.lmpill .tt-gmap{display:none;justify-content:center;align-items:center;gap:5px;margin-top:7px;font-size:11.5px;font-weight:700;white-space:nowrap;color:#1a73e8;background:#fff;border:1px solid #c6dafc;border-radius:8px;padding:6px 9px;text-decoration:none;}
+  .lmtip.open .tt-gmap,.lmpill.open .tt-gmap{display:flex;}
 
   /* 패널 */
   .phead{display:flex;align-items:baseline;gap:8px;margin:2px 2px 10px;}
@@ -1574,10 +1591,40 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* 내 위치 마커 */
   .meDot{width:12px;height:12px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 4px rgba(26,115,232,.3);}
   .leaflet-tooltip.lmtip.me{background:#1a73e8;}
+  .fbtn.wide{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:11px;font-size:13.5px;}
+  .fbtn.wide svg{width:14px;height:14px;}
+  /* 지도 위 컨트롤(내 위치) */
+  .leaflet-control.mapbtns{margin-bottom:10px;margin-right:10px;}
+  .mybtn{width:40px;height:40px;border-radius:9px;background:#fff;border:1px solid #c9d3da;box-shadow:0 1px 5px rgba(0,0,0,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5b6570;}
+  .mybtn:hover{background:#f3f5f7;}
+  .mybtn.on{color:#1a73e8;border-color:#1a73e8;}
+  .mybtn svg{width:21px;height:21px;}
+  .leaflet-bar a{border-radius:0;}
+  /* 상단바 + 드로어 */
+  #topbar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;border-bottom:1px solid #e6e9ec;flex:none;}
+  .tb-brand{font-size:15.5px;font-weight:800;letter-spacing:-.3px;}
+  .tb-menu{margin-left:auto;width:38px;height:38px;border-radius:9px;border:1px solid #d9dee3;background:#fff;font-size:18px;cursor:pointer;color:#3a424b;line-height:1;}
+  .tb-menu:hover{background:#f3f5f7;}
+  .drawer{position:fixed;top:0;right:-340px;width:300px;max-width:85vw;height:100%;background:#fff;box-shadow:-6px 0 26px rgba(0,0,0,.22);z-index:5000;transition:right .25s ease;display:flex;flex-direction:column;}
+  .drawer.open{right:0;}
+  .dr-head{display:flex;align-items:center;justify-content:space-between;padding:17px 18px;border-bottom:1px solid #eee;font-weight:800;font-size:15px;}
+  .dr-head button{border:none;background:none;font-size:18px;cursor:pointer;color:#5b6570;}
+  #drItems{padding:12px;display:flex;flex-direction:column;gap:9px;}
+  .dritem{display:block;padding:14px 15px;border-radius:11px;background:#f5f6f8;font-weight:700;font-size:14px;color:#222831;text-decoration:none;border:1px solid #e7eaed;}
+  .dritem:hover{background:#eef0f3;}
+  .dritem .dv{display:block;font-weight:600;font-size:12.5px;color:#1a73e8;margin-top:3px;word-break:break-all;}
+  .dritem.tel .dv{color:#1a73e8;}
+  .drawerbg{position:fixed;inset:0;background:rgba(0,0,0,.32);z-index:4900;opacity:0;pointer-events:none;transition:opacity .25s;}
+  .drawerbg.open{opacity:1;pointer-events:auto;}
   @media (max-width:760px){
-    #body{flex-direction:column;}
-    #map{flex:none;height:52%;min-height:240px;width:100%;}
-    #panel{flex:1;width:100%;height:auto;border-left:none;border-top:1px solid #e6e9ec;padding:14px;}
+    #topbar{padding:9px 14px;}
+    .tb-brand{font-size:14px;}
+    #body{position:relative;}
+    #map{flex:1;height:100%;width:100%;min-height:0;}
+    #panel.sheet{position:absolute;left:0;right:0;bottom:0;width:100%;height:45%;background:#f7f8f6;border-left:none;border-top:none;border-radius:16px 16px 0 0;box-shadow:0 -5px 22px rgba(0,0,0,.18);z-index:1000;transition:height .2s ease;}
+    #sheetHandle{display:flex;justify-content:center;align-items:center;padding:9px;flex:none;cursor:grab;touch-action:none;}
+    #sheetHandle .grip{width:42px;height:5px;border-radius:3px;background:#cdd4da;}
+    #sheetScroll{padding:4px 14px 18px;}
     .scard{padding:14px 16px;border-radius:14px;}
     .scard .nm{font-size:16px;}
     .chip{font-size:12.5px;padding:5px 11px;}
@@ -1585,18 +1632,21 @@ svg.leaflet-image-layer.leaflet-interactive path {
     .scard .gmap{font-size:14.5px;padding:11px;}
     .leaflet-tooltip.nmtip{font-size:12.5px;width:152px;}
     .nmtip .tt-nm{font-size:13px;} .nmtip .tt-sub{font-size:11.5px;} .nmtip .tt-line{font-size:11.5px;}
-    .leaflet-tooltip.lmtip{font-size:13.5px;}
+    .leaflet-tooltip.lmtip,.leaflet-tooltip.lmpill{font-size:13.5px;}
   }
 </style>
 </head>
 <body>
 
 <div id="wrap">
+  <div id="topbar"><div class="tb-brand" id="tbBrand">ODAL 지정 주유소 안내</div><button id="menuBtn" class="tb-menu" aria-label="메뉴">&#9776;</button></div>
   <div id="body">
     <div id="map"></div>
     <div id="panel"></div>
   </div>
 </div>
+<div id="drawer" class="drawer"><div class="dr-head"><span>메뉴</span><button id="drClose" aria-label="닫기">&#10005;</button></div><div id="drItems"></div></div>
+<div id="drawerbg" class="drawerbg"></div>
 
 <script>
 /* @preserve
@@ -1624,11 +1674,16 @@ const CAR = '<svg width="17" height="17" viewBox="0 0 24 24" fill="#fff"><path d
 const PLANE = '<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M21 16v-2l-8-5V3.5A1.5 1.5 0 0 0 11.5 2 1.5 1.5 0 0 0 10 3.5V9l-8 5v2l8-2.5V18l-2 1.5V21l3.5-1 3.5 1v-1.5L13 18v-4.5L21 16Z"/></svg>';
 const CLOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7a8590" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2" stroke-linecap="round"/></svg>';
 const PIN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>';
+function nl(t){ return (t==null?'':String(t)).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\r?\n/g,'<br>'); }
 
 /* 지도 */
-const map = L.map("map", { zoomControl:true }).setView(D.meta.center, D.meta.zoom);
+const map = L.map("map", { zoomControl:false }).setView(D.meta.center, D.meta.zoom);
 L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
   { subdomains:"abcd", maxZoom:19, attribution:'&copy; OpenStreetMap &copy; CARTO' }).addTo(map);
+L.control.zoom({ position:"bottomright" }).addTo(map);
+const LOCSVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>';
+const LocateCtl = L.Control.extend({ options:{position:"bottomright"}, onAdd:function(){ const d=L.DomUtil.create("div","leaflet-control mapbtns"); const b=L.DomUtil.create("div","mybtn",d); b.innerHTML=LOCSVG; b.title="내 위치"; L.DomEvent.disableClickPropagation(d); L.DomEvent.on(b,"click",function(){ doLocate(b); }); return d; } });
+map.addControl(new LocateCtl());
 
 function gmapUrl(s){ return `https://www.google.com/maps/search/?api=1&query=${s.lat},${s.lng}&query_place_id=${s.pid}`; }
 
@@ -1642,7 +1697,7 @@ function cardHTML(s){
   const note = s.note ? `<div class="note">${s.note}</div>` : "";
   const tag = s.tag ? `<div class="tag">${s.tag}</div>` : "";
   const gm = `<a class="gmap" href="${gmapUrl(s)}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a>`;
-  return `<div class="nm"><span class="nmL"><span class="cdot ${s.pay}"></span>${s.short}</span><span class="dist"></span></div>`
+  return `<div class="nm"><span class="nmL"><span class="cdot ${s.pay}"></span>${nl(s.short)}</span><span class="dist"></span></div>`
        + `<div class="chips">${pay}${svc}${closed}</div>${hrs}${note}${tag}${gm}`;
 }
 
@@ -1654,13 +1709,16 @@ const F = { pay:"all", svc:"all", open:false, sort:false };
 let userLL = null, userMarker = null;
 
 panel.innerHTML =
-    `<div class="phead"><b>주유소</b><span class="fcount" id="fcount"></span></div>`
-  + `<div id="filters">`
-  +   `<div class="ftop"><button class="fbtn" id="fopen">🕒 지금 영업중</button><button class="fbtn loc" id="floc">${PINW}내 위치</button></div>`
-  +   `<div class="frow"><span class="flabel">결제</span><div class="fseg" id="fpay"><button data-v="both">현금·카드</button><button data-v="cash">현금 ONLY</button></div></div>`
-  +   `<div class="frow"><span class="flabel">주유</span><div class="fseg" id="fsvc"><button data-v="self">셀프</button><button data-v="staff">직원 대응</button></div></div>`
-  + `</div>`
-  + `<div id="stationList"></div>`;
+    `<div id="sheetHandle"><div class="grip"></div></div>`
+  + `<div id="sheetScroll">`
+  +   `<div class="phead"><b>주유소</b><span class="fcount" id="fcount"></span></div>`
+  +   `<div id="filters">`
+  +     `<button class="fbtn wide" id="fopen">🕒 지금 영업중</button>`
+  +     `<div class="frow"><span class="flabel">결제</span><div class="fseg" id="fpay"><button data-v="both">현금·카드</button><button data-v="cash">현금 ONLY</button></div></div>`
+  +     `<div class="frow"><span class="flabel">주유</span><div class="fseg" id="fsvc"><button data-v="self">셀프</button><button data-v="staff">직원 대응</button></div></div>`
+  +   `</div>`
+  +   `<div id="stationList"></div>`
+  + `</div>`;
 const listEl  = panel.querySelector("#stationList");
 const countEl = panel.querySelector("#fcount");
 
@@ -1692,6 +1750,7 @@ function selectStation(id){
   card.classList.remove("active");
   card.classList.add("selected");
   setSel(id, true);
+  if(window.__expandSheet) window.__expandSheet();
   if(card.isConnected) card.scrollIntoView({ behavior:"smooth", block:"center" });
   map.panTo(markers[id].getLatLng(), { animate:true });
 }
@@ -1706,7 +1765,7 @@ D.stations.forEach(s=>{
   const svcTxt = s.svc==="self" ? '셀프' : '직원 대응';
   const noteL = s.note ? `<div class="tt-line">${s.note}</div>` : '';
   const tagL = s.tag ? `<div class="tt-tag">${s.tag}</div>` : '';
-  const ttHtml = `<div class="tt-nm">${s.short}</div>`
+  const ttHtml = `<div class="tt-nm">${nl(s.short)}</div>`
     + `<div class="tt-sub">${payL} · ${closedL}</div>`
     + `<div class="tt-more">${tagL}<div class="tt-line">${svcTxt} · ${s.hours}</div>${noteL}`
     + `<a class="tt-gmap" href="${gmapUrl(s)}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a></div>`;
@@ -1762,51 +1821,110 @@ segHandler("#fsvc","svc");
 const openBtn = panel.querySelector("#fopen");
 openBtn.addEventListener("click", ()=>{ F.open=!F.open; openBtn.classList.toggle("on",F.open); renderList(); });
 
-const locBtn = panel.querySelector("#floc");
-locBtn.addEventListener("click", ()=>{
-  if(F.sort){ F.sort=false; locBtn.classList.remove("on"); locBtn.innerHTML=PINW+"내 위치"; renderList(); return; }
+function doLocate(btn){
+  if(F.sort){ F.sort=false; if(btn) btn.classList.remove("on"); renderList(); return; }
   if(!navigator.geolocation){ alert("이 브라우저에서는 위치 기능을 사용할 수 없어요."); return; }
-  locBtn.innerHTML = PINW+"확인 중…";
-  navigator.geolocation.getCurrentPosition(pos=>{
+  navigator.geolocation.getCurrentPosition(function(pos){
     userLL=[pos.coords.latitude, pos.coords.longitude];
     if(userMarker){ userMarker.setLatLng(userLL); }
-    else { userMarker=L.marker(userLL,{draggable:false,icon:L.divIcon({className:"",html:'<div class="meDot"></div>',iconSize:[18,18],iconAnchor:[9,9]})}).addTo(map).bindTooltip("내 위치",{permanent:true,direction:"top",offset:[0,-6],className:"lmtip me"}); }
-    F.sort=true; locBtn.classList.add("on"); locBtn.innerHTML=PINW+"가까운 순";
-    renderList();
-    try{ map.setView(userLL, 13); }catch(e){}
-  }, err=>{
-    locBtn.innerHTML = PINW+"내 위치";
-    alert("위치를 가져오지 못했어요. 브라우저의 위치 권한을 허용해 주세요. (HTTPS 환경에서만 동작합니다)");
-  }, { enableHighAccuracy:true, timeout:8000, maximumAge:60000 });
-});
+    else { userMarker=L.marker(userLL,{draggable:false,icon:L.divIcon({className:"",html:'<div class="meDot"></div>',iconSize:[18,18],iconAnchor:[9,9]})}).addTo(map).bindTooltip("내 위치",{permanent:false,direction:"top",className:"lmtip me"}); }
+    F.sort=true; if(btn) btn.classList.add("on"); renderList();
+    try{ map.setView(userLL, 14); }catch(e){}
+  }, function(){ alert("위치를 가져오지 못했어요. 브라우저의 위치 권한을 허용해 주세요. (HTTPS 환경에서만 동작합니다)"); }, { enableHighAccuracy:true, timeout:8000, maximumAge:60000 });
+}
 
 renderList();
 
-/* 랜드마크 */
+/* 랜드마크 (dot: odal/airport/ic, 그 외: 자동너비 라벨) */
 const lmark = {};
 D.landmarks.forEach(l=>{
-  let icon, tip=null, tipCls="";
-  if(l.kind==="odal"){ icon=L.divIcon({className:"",html:`<div class="lmdot odal">${CAR}</div>`,iconSize:[30,30],iconAnchor:[15,15]}); tip=l.name; tipCls="lmtip"; }
-  else if(l.kind==="airport"){ icon=L.divIcon({className:"",html:`<div class="lmdot airport">${PLANE}</div>`,iconSize:[30,30],iconAnchor:[15,15]}); tip=l.name; tipCls="lmtip airport"; }
-  else if(l.kind==="ic"){ icon=L.divIcon({className:"",html:`<div class="lmdot ic">IC</div>`,iconSize:[30,30],iconAnchor:[15,15]}); tip=l.name; tipCls="lmtip ic"; }
-  else { icon=L.divIcon({className:"",html:`<div class="koklabel">${l.name}</div>`,iconSize:[Math.max(60,(l.name||"").length*15),26],iconAnchor:[Math.max(30,(l.name||"").length*7.5),13]}); }
+  const color = l.color || "#7a59c4";
   const gurl = l.pid ? `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}&query_place_id=${l.pid}` : `https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lng}`;
-  const hasBtn = !!l.pid && l.kind!=="kokusai";
-  let tipOpts = { permanent:true, direction:(l.kind==="ic"?"top":"right"), offset:[l.kind==="ic"?0:11, l.kind==="ic"?-9:0], className:tipCls };
-  if(hasBtn){
-    tip = `<div class="tt-odnm">${l.name}</div><a class="tt-gmap" href="${gurl}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a>`;
-    tipOpts.className = tipCls + " odaltip";
-    tipOpts.interactive = true;
+  const isDot = (l.kind==="odal" || l.kind==="airport" || l.kind==="ic");
+  let m, te;
+  if(isDot){
+    const glyph = l.kind==="odal" ? CAR : (l.kind==="airport" ? PLANE : "IC");
+    const dcls = l.kind==="ic" ? "lmdot ic" : "lmdot";
+    const icon = L.divIcon({className:"",html:`<div class="${dcls}" style="background:${color}">${glyph}</div>`,iconSize:[30,30],iconAnchor:[15,15]});
+    m = L.marker([l.lat, l.lng], { draggable:false, icon, zIndexOffset:1000 }).addTo(map);
+    const dir = l.kind==="ic" ? "top" : "right";
+    const off = l.kind==="ic" ? [0,-9] : [11,0];
+    let tip, opts = { permanent:true, direction:dir, offset:off, className:"lmtip" };
+    if(l.pid){
+      tip = `<span class="lmpill-nm">${nl(l.name)}</span><a class="tt-gmap" href="${gurl}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a>`;
+      opts.interactive = true;
+    } else { tip = `<span class="lmpill-nm">${nl(l.name)}</span>`; }
+    m.bindTooltip(tip, opts);
+    te = m.getTooltip().getElement();
+    if(te){ te.style.background = color; }
+  } else {
+    const icon = L.divIcon({className:"lm-empty",html:"",iconSize:[1,1],iconAnchor:[0,0]});
+    m = L.marker([l.lat, l.lng], { draggable:false, icon, zIndexOffset:1000 }).addTo(map);
+    let tip;
+    if(l.pid){ tip = `<span class="lmpill-nm">${nl(l.name)}</span><a class="tt-gmap" href="${gurl}" target="_blank" rel="noopener">${PIN}구글맵에서 보기</a>`; }
+    else { tip = `<span class="lmpill-nm">${nl(l.name)}</span>`; }
+    m.bindTooltip(tip, { permanent:true, interactive:!!l.pid, direction:"center", className:"lmpill" });
+    te = m.getTooltip().getElement();
+    if(te){ te.style.background = color; }
   }
-  const m = L.marker([l.lat, l.lng], { draggable:false, icon, zIndexOffset:1000 }).addTo(map);
-  if(tip) m.bindTooltip(tip, tipOpts);
-  if(hasBtn){
-    const te = m.getTooltip() && m.getTooltip().getElement();
-    if(te){ te.addEventListener("click", (e)=>{ if(e.target.closest(".tt-gmap")) return; te.classList.toggle("open"); }); }
-  }
-  if(l.kind==="kokusai" && l.pid){ m.on("click", ()=>window.open(gurl, "_blank")); const ke=m.getElement(); if(ke) ke.style.cursor="pointer"; }
+  if(l.pid && te){ te.addEventListener("click", (e)=>{ if(e.target.closest(".tt-gmap")) return; te.classList.toggle("open"); }); }
   lmark[l.id] = m;
 });
+
+/* 상단바 + 드로어(메뉴) */
+(function(){
+  const brand = document.getElementById("tbBrand");
+  if(brand) brand.textContent = (D.meta && D.meta.brand) || "ODAL 지정 주유소 안내";
+  const items = document.getElementById("drItems");
+  const menu = (D.meta && D.meta.menu) || [];
+  if(items){
+    items.innerHTML = menu.map(function(mi){
+      const v = (mi.value||"").replace(/"/g,"&quot;");
+      if(mi.type==="tel"){ return `<a class="dritem tel" href="tel:${v}">${nl(mi.label)}<span class="dv">${nl(mi.value)}</span></a>`; }
+      return `<a class="dritem" href="${v}" target="_blank" rel="noopener">${nl(mi.label)}<span class="dv">바로가기 →</span></a>`;
+    }).join("");
+  }
+  const dr = document.getElementById("drawer"), bg = document.getElementById("drawerbg");
+  function open(){ dr.classList.add("open"); bg.classList.add("open"); }
+  function close(){ dr.classList.remove("open"); bg.classList.remove("open"); }
+  const mb=document.getElementById("menuBtn"); if(mb) mb.onclick=open;
+  const dc=document.getElementById("drClose"); if(dc) dc.onclick=close;
+  if(bg) bg.onclick=close;
+})();
+
+/* 모바일 바텀시트 (높이 조절 바 + 스냅) */
+(function(){
+  const mq = window.matchMedia("(max-width:760px)");
+  const panelEl = document.getElementById("panel");
+  const handle = document.getElementById("sheetHandle");
+  const bodyEl = document.getElementById("body");
+  function bodyH(){ return (bodyEl ? bodyEl.clientHeight : window.innerHeight) || 500; }
+  function snaps(){ const h=bodyH(); return { peek:96, half:Math.round(h*0.5), full:Math.round(h*0.86) }; }
+  let cur = "peek";
+  function setSheet(state, px){ const s=snaps(); let h = (px!=null) ? px : s[state]; h=Math.max(s.peek, Math.min(s.full, h)); panelEl.style.height=h+"px"; if(px==null && state) cur=state; }
+  function applyMobile(){ if(mq.matches){ panelEl.classList.add("sheet"); setSheet("peek"); } else { panelEl.classList.remove("sheet"); panelEl.style.height=""; panelEl.style.transition=""; } }
+  applyMobile();
+  if(mq.addEventListener) mq.addEventListener("change", applyMobile); else if(mq.addListener) mq.addListener(applyMobile);
+  window.addEventListener("resize", function(){ if(mq.matches) setSheet(cur); });
+  let dragging=false, startY=0, startH=0, moved=false;
+  function down(e){ if(!mq.matches) return; dragging=true; moved=false; startY=(e.touches?e.touches[0].clientY:e.clientY); startH=panelEl.getBoundingClientRect().height; panelEl.style.transition="none"; }
+  function move(e){ if(!dragging) return; const y=(e.touches?e.touches[0].clientY:e.clientY); const dy=startY-y; if(Math.abs(dy)>4) moved=true; setSheet(null, startH+dy); if(e.cancelable) e.preventDefault(); }
+  function up(){ if(!dragging) return; dragging=false; panelEl.style.transition=""; const s=snaps(); const h=panelEl.getBoundingClientRect().height;
+    if(!moved){ cur=(cur==="peek"?"half":"peek"); setSheet(cur); return; }
+    const opts=[["peek",s.peek],["half",s.half],["full",s.full]]; let best=opts[0], bd=1e9;
+    opts.forEach(function(o){ const d=Math.abs(o[1]-h); if(d<bd){ bd=d; best=o; } });
+    cur=best[0]; setSheet(cur);
+  }
+  if(handle){
+    handle.addEventListener("mousedown", down);
+    handle.addEventListener("touchstart", down, {passive:false});
+  }
+  window.addEventListener("mousemove", move);
+  window.addEventListener("touchmove", move, {passive:false});
+  window.addEventListener("mouseup", up);
+  window.addEventListener("touchend", up);
+  window.__expandSheet = function(){ if(mq.matches && cur==="peek"){ cur="half"; setSheet("half"); } };
+})();
 
 /* 모든 핀 보이도록 */
 (function(){
@@ -1828,7 +1946,9 @@ let S = JSON.parse(JSON.stringify(window.GEO_DATA));
 S.meta = S.meta || {center:[26.175,127.67], zoom:13};
 if(!S.meta.pinColor) S.meta.pinColor='#2e9d68';
 if(!S.meta.accent) S.meta.accent='#aa1166';
-S.landmarks.forEach(l=>{ if(!l.color) l.color=DEFC[l.kind]||'#aa1166'; if(l.pid==null) l.pid=''; });
+if(!S.meta.brand) S.meta.brand='ODAL 지정 주유소 안내';
+if(!Array.isArray(S.meta.menu)) S.meta.menu=[{label:'오달렌터카 구글맵',type:'link',value:'https://www.google.com/maps/search/?api=1&query=26.167595,127.6686257&query_place_id=ChIJOVA6TqRp5TQRhKu5BquXkI4'},{label:'긴급 연락처',type:'tel',value:'+82-70-7017-7057'}];
+S.landmarks.forEach(l=>{ if(!l.color) l.color=DEFC[l.kind]||'#7a59c4'; if(l.pid==null) l.pid=''; if(!l.id) l.id='lm'+Math.random().toString(36).slice(2,8); });
 
 const elColors=document.getElementById('colors');
 const elList=document.getElementById('list');
@@ -1844,6 +1964,7 @@ function toMin(v){ if(!v)return 0; const p=v.split(':'); return (+p[0])*60+(+(p[
 function el(t,c){ const e=document.createElement(t); if(c)e.className=c; return e; }
 function note(t){ msg.textContent=t; clearTimeout(note._t); note._t=setTimeout(()=>{ if(msg.textContent===t) msg.textContent=''; }, 4000); }
 function input(val,on,attrs){ const i=el('input'); i.value=(val==null?'':val); if(attrs)for(const k in attrs)i.setAttribute(k,attrs[k]); i.addEventListener('input',()=>on(i.value)); return i; }
+function ta(val,on,cls){ const t=el('textarea',cls); t.value=(val==null?'':val); t.rows=1; t.style.cssText='width:100%;font-family:inherit;font-size:14px;font-weight:700;line-height:1.35;padding:7px 9px;border:1px solid #d9dee3;border-radius:8px;resize:vertical;min-height:36px;'; t.addEventListener('input',()=>on(t.value)); return t; }
 function field(label,val,on,full,attrs){ const f=el('div','f'+(full?' full':'')); const l=el('label'); l.textContent=label; f.appendChild(l); f.appendChild(input(val,on,attrs)); return f; }
 function selectField(label,val,opts,on){ const f=el('div','f'); const l=el('label'); l.textContent=label; f.appendChild(l); const s=el('select'); opts.forEach(o=>{const op=el('option');op.value=o[0];op.textContent=o[1];if(o[0]===val)op.selected=true;s.appendChild(op);}); s.addEventListener('change',()=>on(s.value)); f.appendChild(s); return f; }
 function colorField(label,val,on){ const f=el('div','f'); const l=el('label'); l.textContent=label; f.appendChild(l); const row=el('div','crow'); const c=el('input'); c.type='color'; c.value=val; const t=el('input'); t.value=val; t.style.flex='1'; c.addEventListener('input',()=>{t.value=c.value;on(c.value);}); t.addEventListener('input',()=>{let v=t.value.trim(); if(/^#?[0-9a-fA-F]{6}$/.test(v)){ if(v[0]!=='#')v='#'+v; c.value=v; on(v);} }); row.appendChild(c); row.appendChild(t); f.appendChild(row); return f; }
@@ -1880,7 +2001,7 @@ function renderStations(){
   S.stations.forEach((s,idx)=>{
     const key='st-'+idx; const card=el('div','acard'); const top=el('div','arow');
     const ix=el('div','aidx'); ix.textContent=(idx+1); top.appendChild(ix);
-    const nm=input(s.short,v=>{s.short=v;const mk=markers[key];if(mk)mk.setTooltipContent(v||'(이름없음)');}); nm.className='namein'; top.appendChild(nm);
+    const nm=ta(s.short,v=>{s.short=v;const mk=markers[key];if(mk)mk.setTooltipContent(v||'(이름없음)');},'namein'); top.appendChild(nm);
     const loc=el('button','mini'); loc.textContent='지도에서 위치'; loc.onclick=()=>focusMarker(key); top.appendChild(loc);
     const del=el('button','del'); del.textContent='삭제'; del.onclick=()=>{ if(confirm('이 주유소를 삭제할까요?')){ S.stations.splice(idx,1); render(); } }; top.appendChild(del);
     card.appendChild(top);
@@ -1901,22 +2022,44 @@ function renderLandmarks(){
   S.landmarks.forEach((l,idx)=>{
     const key='lm-'+idx; const card=el('div','acard lm'); const top=el('div','arow');
     const ix=el('div','aidx'); ix.textContent=({odal:'오',airport:'공',ic:'IC',kokusai:'국'})[l.kind]||'•'; top.appendChild(ix);
-    const nm=input(l.name,v=>{l.name=v;const mk=markers[key];if(mk)mk.setTooltipContent(v||'(이름없음)');}); nm.className='namein'; top.appendChild(nm);
+    const nm=ta(l.name,v=>{l.name=v;const mk=markers[key];if(mk)mk.setTooltipContent(v||'(이름없음)');},'namein'); top.appendChild(nm);
     const loc=el('button','mini'); loc.textContent='지도에서 위치'; loc.onclick=()=>focusMarker(key); top.appendChild(loc);
+    const del=el('button','del'); del.textContent='삭제'; del.onclick=()=>{ if(confirm('이 랜드마크를 삭제할까요?')){ S.landmarks.splice(idx,1); render(); } }; top.appendChild(del);
     card.appendChild(top);
     const g=el('div','grid');
-    g.appendChild(colorField('아이콘 색상', l.color||DEFC[l.kind]||'#aa1166', v=>{ l.color=v; const mk=markers[key]; if(mk){ const e=mk.getElement(); const d=e&&e.querySelector('.pin'); if(d)d.style.background=v; } }));
-    g.appendChild(field('구글맵 place_id', l.pid||'', v=>l.pid=v, false, {placeholder:'ChIJ... (비우면 좌표로 열림)'}));
+    g.appendChild(selectField('종류', l.kind, [['odal','오달(차 아이콘)'],['airport','공항(비행기)'],['ic','IC(고속도로)'],['kokusai','라벨(국제거리)'],['label','라벨(글자 알약)']], v=>{ l.kind=v; render(); }));
+    g.appendChild(colorField('아이콘/라벨 색상', l.color||DEFC[l.kind]||'#7a59c4', v=>{ l.color=v; const mk=markers[key]; if(mk){ const e=mk.getElement(); const d=e&&e.querySelector('.pin'); if(d)d.style.background=v; } }));
+    g.appendChild(field('구글맵 place_id', l.pid||'', v=>l.pid=v, true, {placeholder:'ChIJ... (비우면 좌표로 열림)'}));
     card.appendChild(g); card.appendChild(coordRow(l,key));
     elLm.appendChild(card);
   });
+}
+function renderMenu(){
+  const box=document.getElementById('menued'); if(!box) return; box.innerHTML='';
+  box.appendChild(field('상단바 제목(brand)', S.meta.brand||'', v=>{ S.meta.brand=v; }, true, {placeholder:'예: ODAL 지정 주유소 안내'}));
+  if(!Array.isArray(S.meta.menu)) S.meta.menu=[];
+  S.meta.menu.forEach((mi,idx)=>{
+    const card=el('div','acard'); const top=el('div','arow');
+    const ix=el('div','aidx'); ix.textContent=(idx+1); top.appendChild(ix);
+    const nm=input(mi.label,v=>mi.label=v,{placeholder:'메뉴 이름'}); nm.className='namein'; top.appendChild(nm);
+    const del=el('button','del'); del.textContent='삭제'; del.onclick=()=>{ S.meta.menu.splice(idx,1); renderMenu(); }; top.appendChild(del);
+    card.appendChild(top);
+    const g=el('div','grid');
+    g.appendChild(selectField('종류', mi.type||'link', [['link','링크(웹/구글맵)'],['tel','전화번호']], v=>mi.type=v));
+    g.appendChild(field('내용(주소 또는 전화)', mi.value||'', v=>mi.value=v, true, {placeholder:'https://... 또는 +82-70-...'}));
+    card.appendChild(g);
+    box.appendChild(card);
+  });
+  const add=el('button','btn'); add.textContent='＋ 메뉴 항목 추가'; add.style.width='100%';
+  add.onclick=()=>{ S.meta.menu.push({label:'새 메뉴',type:'link',value:''}); renderMenu(); };
+  box.appendChild(add);
 }
 function getObj(key){ const a=key.split('-'); return a[0]==='st'?S.stations[+a[1]]:S.landmarks[+a[1]]; }
 function refreshMarkers(){ for(const k in markers)map.removeLayer(markers[k]); for(const k in markers)delete markers[k];
   S.stations.forEach((s,idx)=>addMarker('st-'+idx,s,false)); S.landmarks.forEach((l,idx)=>addMarker('lm-'+idx,l,true)); }
 function addMarker(key,obj,isLm){ if(obj.lat==null||obj.lng==null||isNaN(obj.lat)||isNaN(obj.lng))return;
   const color=isLm?(obj.color||DEFC[obj.kind]||'#aa1166'):(S.meta.pinColor||'#2e9d68');
-  const label=isLm?({odal:'오',ic:'IC',airport:'공',kokusai:'국'})[obj.kind]:'';
+  const label=isLm?(({odal:'오',ic:'IC',airport:'공',kokusai:'국'})[obj.kind]||''):'';
   const html=isLm?('<div class="pin lm" style="background:'+color+'">'+label+'</div>'):('<div class="pin" style="background:'+color+'"></div>');
   const size=isLm?24:16;
   const m=L.marker([obj.lat,obj.lng],{draggable:true,icon:L.divIcon({className:'',html:html,iconSize:[size,size],iconAnchor:[size/2,size/2]})}).addTo(map);
@@ -1925,7 +2068,7 @@ function addMarker(key,obj,isLm){ if(obj.lat==null||obj.lng==null||isNaN(obj.lat
   markers[key]=m; }
 function moveMarker(key){ const m=markers[key],o=getObj(key); if(m&&o.lat!=null&&o.lng!=null&&!isNaN(o.lat)&&!isNaN(o.lng))m.setLatLng([o.lat,o.lng]); }
 function focusMarker(key){ const m=markers[key]; if(m){ map.panTo(m.getLatLng(),{animate:true}); m.openTooltip(); } }
-function render(){ renderColors(); renderStations(); renderLandmarks(); refreshMarkers(); }
+function render(){ renderColors(); renderMenu(); renderStations(); renderLandmarks(); refreshMarkers(); }
 
 // ===== 내보내기 =====
 function buildMapHTML(){ let tpl=document.getElementById('maptpl').textContent; tpl=tpl.replace(/<\\\/script>/g,'<\/script>'); return tpl.replace('/*__GEO_DATA__*/', JSON.stringify(S,null,2)); }
@@ -1934,6 +2077,7 @@ document.getElementById('dlmap').onclick=()=>{ download('index.html', buildMapHT
 document.getElementById('cpjson').onclick=async()=>{ const t=JSON.stringify(S,null,2); try{await navigator.clipboard.writeText(t);note('데이터(JSON) 복사됨');}catch(e){prompt('아래 JSON 복사',t);} };
 document.getElementById('ldjson').onclick=()=>{ const t=prompt('불러올 데이터(JSON)를 붙여넣기'); if(!t)return; try{const d=JSON.parse(t); if(!d.stations)throw new Error('형식 오류'); S=d; S.meta=S.meta||{center:[26.175,127.67],zoom:13}; if(!S.meta.pinColor)S.meta.pinColor='#2e9d68'; if(!S.meta.accent)S.meta.accent='#aa1166'; S.landmarks.forEach(l=>{if(!l.color)l.color=DEFC[l.kind]; if(l.pid==null)l.pid='';}); render(); note('불러옴');}catch(e){alert('JSON 오류: '+e.message);} };
 document.getElementById('addst').onclick=()=>{ const c=map.getCenter(); S.stations.push({short:'새 주유소',pay:'both',svc:'self',closed:'연중무휴',hours:'24시간',note:'',tag:'',oh:[[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440],[0,1440]],lat:+c.lat.toFixed(7),lng:+c.lng.toFixed(7),pid:''}); render(); elList.lastChild.scrollIntoView({behavior:'smooth',block:'center'}); };
+document.getElementById('addlm').onclick=()=>{ const c=map.getCenter(); S.landmarks.push({id:'lm'+Date.now(),kind:'label',name:'새 장소',color:'#7a59c4',lat:+c.lat.toFixed(7),lng:+c.lng.toFixed(7),pid:''}); render(); elLm.lastChild.scrollIntoView({behavior:'smooth',block:'center'}); };
 
 // ===== GitHub 라이브 저장 =====
 const GHKEY='odalgh';
@@ -1968,6 +2112,25 @@ async function liveSave(){
 document.getElementById('btnsave').onclick=liveSave;
 
 render();
+
+/* 시작 시 라이브 사이트(index.html)의 최신 데이터를 불러와 관리자에 반영 (새로고침해도 기본값으로 안 돌아감) */
+async function loadLatest(){
+  try{
+    const res=await fetch('index.html?cb='+Date.now(),{cache:'no-store'});
+    if(!res.ok) return;
+    const txt=await res.text();
+    const mm=txt.match(/window\.GEO_DATA\s*=\s*(\{[\s\S]*?\n\});/);
+    if(!mm) return;
+    let data; try{ data=JSON.parse(mm[1]); }catch(e){ try{ data=Function('return ('+mm[1]+')')(); }catch(e2){ return; } }
+    if(!data||!data.stations||!data.stations.length) return;
+    S=data; S.meta=S.meta||{center:[26.175,127.67],zoom:13};
+    if(!S.meta.pinColor)S.meta.pinColor='#2e9d68'; if(!S.meta.accent)S.meta.accent='#aa1166';
+    if(!S.meta.brand)S.meta.brand='ODAL 지정 주유소 안내'; if(!Array.isArray(S.meta.menu))S.meta.menu=[];
+    S.landmarks.forEach(l=>{ if(!l.color)l.color=DEFC[l.kind]||'#7a59c4'; if(l.pid==null)l.pid=''; if(!l.id)l.id='lm'+Math.random().toString(36).slice(2,8); });
+    render(); note('라이브 사이트의 최신 내용을 불러왔어요');
+  }catch(e){}
+}
+loadLatest();
 
 </script>
 </body>
