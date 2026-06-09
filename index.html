@@ -1186,7 +1186,15 @@ function fitAll(){
   const pts = [];
   D.stations.forEach(s=> pts.push(markers[s.id].getLatLng()));
   D.landmarks.forEach(l=> pts.push(lmark[l.id].getLatLng()));
-  if(pts.length) map.fitBounds(L.latLngBounds(pts), { padding:[45,45], maxZoom:15 });
+  if(pts.length){
+    const panelEl = document.getElementById("panel");
+    if(panelEl && panelEl.classList.contains("sheet")){
+      /* 모바일 첫 화면: 좌·하단 여백을 더 크게 → 핀 묶음이 살짝 오른쪽·위로 치우침 */
+      map.fitBounds(L.latLngBounds(pts), { paddingTopLeft:[58,24], paddingBottomRight:[22,86], maxZoom:15, animate:false });
+    } else {
+      map.fitBounds(L.latLngBounds(pts), { padding:[45,45], maxZoom:15, animate:false });
+    }
+  }
   applyZoomMode();
 }
 /* 모바일에서 지도가 잘못된 크기로 초기화되는 문제(오른쪽 미표시·클릭 어긋남·과도 줌) 해결 */
