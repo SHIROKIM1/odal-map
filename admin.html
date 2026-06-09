@@ -1505,7 +1505,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   :root{--pin:#2e9d68;--accent:#aa1166;--odal:#A01861;--airport:#3470a8;--ic:#1f7a3d;--kok:#7a59c4;
     --ink:#222831;--sub:#5b6570;--mut:#98a2ad;--line:#e6e9ec;--bg:#eef0ec;--panel:#f7f8f6;}
   html,body{margin:0;height:100%;font-family:-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);-webkit-text-size-adjust:100%;}
-  #wrap{display:flex;flex-direction:column;height:100%;}
+  #wrap{display:flex;flex-direction:column;height:100vh;height:100dvh;}
   #body{flex:1;display:flex;min-height:0;}
   #map{flex:1;min-width:0;background:#dfe3df;}
   #panel{width:374px;flex:none;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;min-height:0;}
@@ -1513,8 +1513,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   #sheetScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 
   /* 상단바 + 드로어 */
-  #topbar{display:flex;align-items:center;gap:10px;padding:11px 18px;padding-top:calc(11px + env(safe-area-inset-top));background:#fff;border-bottom:1px solid var(--line);flex:none;}
-  .tb-brand{font-size:16px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;}
+  #topbar{display:flex;align-items:center;gap:10px;padding:9px 16px;padding-top:calc(9px + env(safe-area-inset-top));background:#fff;border-bottom:1px solid var(--line);flex:none;}
+  .tb-brand{font-size:15px;font-weight:800;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;}
   .tb-brand .bdot{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none;}
   .tb-menu{margin-left:auto;width:40px;height:40px;border-radius:10px;border:1px solid #e2e6ea;background:#fff;font-size:18px;cursor:pointer;color:#3a424b;line-height:1;display:flex;align-items:center;justify-content:center;}
   .tb-menu:active{background:#f1f3f5;}
@@ -1616,8 +1616,9 @@ svg.leaflet-image-layer.leaflet-interactive path {
   .leaflet-bottom.leaflet-right{margin-bottom:env(safe-area-inset-bottom);}
 
   @media (max-width:760px){
-    #topbar{padding:9px 14px;padding-top:calc(9px + env(safe-area-inset-top));}
-    .tb-brand{font-size:15px;}
+    #topbar{padding:6px 12px;padding-top:calc(6px + env(safe-area-inset-top));gap:8px;}
+    .tb-brand{font-size:14px;}
+    .tb-menu{width:34px;height:34px;font-size:17px;}
     #body{position:relative;}
     #map{height:100%;width:100%;}
     #panel.sheet{position:absolute;left:0;right:0;bottom:0;width:100%;height:46%;background:var(--panel);border:none;border-radius:18px 18px 0 0;box-shadow:0 -6px 26px rgba(0,0,0,.2);z-index:1000;transition:height .2s ease;display:flex;flex-direction:column;overflow:hidden;}
@@ -1755,6 +1756,14 @@ function deselect(){
   setSel(selectedId, false);
   selectedId = null;
 }
+function revealCard(card){
+  const sc = panel.querySelector("#sheetScroll");
+  if(!sc){ card.scrollIntoView({ behavior:"smooth", block:"center" }); return; }
+  const ptop = panel.querySelector(".ptop");
+  const ph = ptop ? ptop.offsetHeight : 0;
+  const delta = card.getBoundingClientRect().top - sc.getBoundingClientRect().top - ph - 6;
+  sc.scrollTo({ top: Math.max(0, sc.scrollTop + delta), behavior:"smooth" });
+}
 function selectStation(id){
   if(id===selectedId){ deselect(); return; }   /* 다시 클릭 → 선택 해제 */
   deselect();
@@ -1764,8 +1773,12 @@ function selectStation(id){
   card.classList.add("selected");
   setSel(id, true);
   if(window.__expandSheet) window.__expandSheet();
-  if(card.isConnected) card.scrollIntoView({ behavior:"smooth", block:"center" });
-  map.panTo(markers[id].getLatLng(), { animate:true });
+  const panelEl = document.getElementById("panel");
+  const mob = panelEl.classList.contains("sheet");
+  const ll = markers[id].getLatLng();
+  map.setView(ll, map.getZoom(), { animate:true });
+  if(mob){ const sh = parseInt(panelEl.style.height)||0; if(sh) map.panBy([0, Math.round(sh*0.45)], { animate:true }); }
+  setTimeout(()=>{ if(card.isConnected) revealCard(card); }, 70);
 }
 
 D.stations.forEach(s=>{
@@ -1786,6 +1799,10 @@ D.stations.forEach(s=>{
   m.on("mouseover", ()=>setHot(s.id,true));
   m.on("mouseout",  ()=>setHot(s.id,false));
   m.on("click",     ()=>selectStation(s.id));
+  m.on("tooltipopen", function(e){
+    const te = e.tooltip.getElement();
+    if(te && !te._tap){ te._tap = 1; te.addEventListener("click", function(ev){ if(ev.target.closest(".tt-gmap")) return; selectStation(s.id); }); }
+  });
   markers[s.id] = m;
 
   const card = document.createElement("div");
@@ -1911,7 +1928,7 @@ D.landmarks.forEach(l=>{
   function snaps(){ const h=bodyH(); return { peek:100, half:Math.round(h*0.5), full:Math.round(h*0.86) }; }
   let cur = "peek";
   function setSheet(state, px){ const s=snaps(); let h = (px!=null) ? px : s[state]; h=Math.max(s.peek, Math.min(s.full, h)); panelEl.style.height=h+"px"; if(px==null && state) cur=state; }
-  function applyMobile(){ if(mq.matches){ panelEl.classList.add("sheet"); setSheet("peek"); } else { panelEl.classList.remove("sheet"); panelEl.style.height=""; panelEl.style.transition=""; } }
+  function applyMobile(){ if(mq.matches){ panelEl.classList.add("sheet"); setSheet("peek"); } else { panelEl.classList.remove("sheet"); panelEl.style.height=""; panelEl.style.transition=""; } setTimeout(function(){ map.invalidateSize(false); }, 60); }
   applyMobile();
   if(mq.addEventListener) mq.addEventListener("change", applyMobile); else if(mq.addListener) mq.addListener(applyMobile);
   window.addEventListener("resize", function(){ if(mq.matches) setSheet(cur); });
@@ -1940,14 +1957,23 @@ const LABEL_ZOOM = 14;
 function applyZoomMode(){ map.getContainer().classList.toggle("pins-only", map.getZoom() < LABEL_ZOOM); }
 map.on("zoomend", applyZoomMode);
 
-/* 모든 핀 보이도록 */
-(function(){
+/* 모든 핀이 보이도록 맞춤 (오달 중심 부근, 전체 줌아웃) */
+function fitAll(){
   const pts = [];
   D.stations.forEach(s=> pts.push(markers[s.id].getLatLng()));
   D.landmarks.forEach(l=> pts.push(lmark[l.id].getLatLng()));
-  map.fitBounds(L.latLngBounds(pts), { padding:[60,60], maxZoom:15 });
+  if(pts.length) map.fitBounds(L.latLngBounds(pts), { padding:[45,45], maxZoom:15 });
   applyZoomMode();
-})();
+}
+/* 모바일에서 지도가 잘못된 크기로 초기화되는 문제(오른쪽 미표시·클릭 어긋남·과도 줌) 해결 */
+function hardRefresh(){ map.invalidateSize(false); fitAll(); }
+hardRefresh();
+requestAnimationFrame(hardRefresh);
+setTimeout(hardRefresh, 120);
+setTimeout(hardRefresh, 350);
+window.addEventListener("load", function(){ setTimeout(hardRefresh, 80); });
+window.addEventListener("orientationchange", function(){ setTimeout(hardRefresh, 250); });
+window.addEventListener("resize", function(){ map.invalidateSize(false); });
 
 <\/script>
 </body>
@@ -2095,9 +2121,9 @@ document.getElementById('addlm').onclick=()=>{ const c=map.getCenter(); S.landma
 
 // ===== 게시판용(iframe) 코드 =====
 function embedUrl(){ const c=ghCfg(); const owner=(c.owner||'SHIROKIM1').toLowerCase(); const repo=c.repo||'odal-map'; return 'https://'+owner+'.github.io/'+repo+'/'; }
-function embedCode(){ const u=embedUrl(); return '<iframe src="'+u+'" title="ODAL 지정 주유소" loading="lazy" allow="geolocation" style="width:100%;height:70vh;min-height:520px;max-height:760px;border:0;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.12);"></iframe>'; }
+function embedCode(){ const u=embedUrl(); return '<div style="position:relative;width:100%;max-width:100%;margin:12px auto;"><iframe src="'+u+'" title="ODAL 지정 주유소" loading="lazy" allow="geolocation" scrolling="no" style="width:100%;min-width:100%;height:78vh;min-height:520px;max-height:760px;border:0;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.12);display:block;"></iframe></div>'; }
 const _cpembed=document.getElementById('cpembed');
-if(_cpembed) _cpembed.onclick=async()=>{ const t=embedCode(); try{ await navigator.clipboard.writeText(t); note('게시판용 코드 복사됨 — 원하는 글/페이지에 붙여넣으세요'); }catch(e){ prompt('아래 코드를 복사하세요', t); } };
+if(_cpembed) _cpembed.onclick=async()=>{ const t=embedCode(); let ok=true; try{ await navigator.clipboard.writeText(t); }catch(e){ try{ const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); }catch(e2){ ok=false; prompt('아래 코드를 복사하세요', t); } } if(ok){ note('\u2705 \uAC8C\uC2DC\uD310\uC6A9 \uCF54\uB4DC\uAC00 \uBCF5\uC0AC\uB418\uC5C8\uC5B4\uC694'); const o=_cpembed.textContent; _cpembed.textContent='\u2705 \uBCF5\uC0AC\uB428!'; _cpembed.disabled=true; setTimeout(()=>{ _cpembed.textContent=o; _cpembed.disabled=false; }, 1600); } };
 
 // ===== GitHub 라이브 저장 =====
 const GHKEY='odalgh';
