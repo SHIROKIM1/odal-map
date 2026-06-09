@@ -295,8 +295,8 @@ window.GEO_DATA = {
     #body{position:relative;}
     #map{height:100%;width:100%;}
     #panel.sheet{position:absolute;left:0;right:0;bottom:0;width:100%;height:46%;background:var(--panel);border:none;border-radius:18px 18px 0 0;box-shadow:0 -6px 26px rgba(0,0,0,.2);z-index:1000;transition:height .2s ease;display:flex;flex-direction:column;overflow:hidden;}
-    #sheetHandle{display:flex;justify-content:center;align-items:center;padding:10px;flex:none;cursor:grab;touch-action:none;}
-    #sheetHandle .grip{width:42px;height:5px;border-radius:3px;background:#cdd4da;}
+    #sheetHandle{display:flex;justify-content:center;align-items:center;padding:16px 10px;flex:none;cursor:grab;touch-action:none;}
+    #sheetHandle .grip{width:52px;height:6px;border-radius:3px;background:#c2c9d1;}
     .ptop{padding:2px 14px 8px;}
     #stationList{padding:8px 14px;padding-bottom:calc(22px + env(safe-area-inset-bottom));}
     .scard{padding:14px 16px;}
@@ -455,8 +455,15 @@ function selectStation(id){
   const panelEl = document.getElementById("panel");
   const mob = panelEl.classList.contains("sheet");
   const ll = markers[id].getLatLng();
-  map.setView(ll, map.getZoom(), { animate:true });
-  if(mob){ const sh = parseInt(panelEl.style.height)||0; if(sh) map.panBy([0, Math.round(sh*0.45)], { animate:true }); }
+  const z = map.getZoom();
+  if(mob){
+    /* 시트가 가리는 높이의 절반만큼 지도 중심을 남쪽으로 → 핀이 '보이는 영역' 중앙에 표시 */
+    const sh = parseInt(panelEl.style.height) || 0;
+    const pt = map.project(ll, z); pt.y += sh/2;
+    map.setView(map.unproject(pt, z), z, { animate:true });
+  } else {
+    map.panTo(ll, { animate:true });
+  }
   setTimeout(()=>{ if(card.isConnected) revealCard(card); }, 280);  /* 시트 펼침(0.2s) 후 카드 위치로 스크롤 */
 }
 
@@ -478,9 +485,12 @@ D.stations.forEach(s=>{
   m.on("mouseover", ()=>setHot(s.id,true));
   m.on("mouseout",  ()=>setHot(s.id,false));
   m.on("click",     ()=>selectStation(s.id));
+  /* 이름표 탭 → 마커 click 이 이벤트 부모로 전파되어 selectStation 이 호출됨(중복 리스너 금지).
+     단, 구글맵 링크 탭은 선택 토글을 막기 위해 전파만 차단 */
   m.on("tooltipopen", function(e){
-    const te = e.tooltip.getElement();
-    if(te && !te._tap){ te._tap = 1; te.addEventListener("click", function(ev){ if(ev.target.closest(".tt-gmap")) return; selectStation(s.id); }); }
+    const te = e.tooltip.getElement(); if(!te) return;
+    const g = te.querySelector(".tt-gmap");
+    if(g && !g._stop){ g._stop = 1; g.addEventListener("click", ev=>ev.stopPropagation()); }
   });
   markers[s.id] = m;
 
@@ -614,7 +624,7 @@ D.landmarks.forEach(l=>{
   window.addEventListener("resize", function(){ if(mq.matches) setSheet(cur); });
   let dragging=false, startY=0, startH=0, moved=false;
   function down(e){ if(!mq.matches) return; dragging=true; moved=false; startY=(e.touches?e.touches[0].clientY:e.clientY); startH=panelEl.getBoundingClientRect().height; panelEl.style.transition="none"; }
-  function move(e){ if(!dragging) return; const y=(e.touches?e.touches[0].clientY:e.clientY); const dy=startY-y; if(Math.abs(dy)>4) moved=true; setSheet(null, startH+dy); if(e.cancelable) e.preventDefault(); }
+  function move(e){ if(!dragging) return; const y=(e.touches?e.touches[0].clientY:e.clientY); const dy=startY-y; if(Math.abs(dy)>2) moved=true; setSheet(null, startH+dy); if(e.cancelable) e.preventDefault(); }
   function up(){ if(!dragging) return; dragging=false; panelEl.style.transition=""; const s=snaps(); const h=panelEl.getBoundingClientRect().height;
     if(!moved){ cur=(cur==="peek"?"half":"peek"); setSheet(cur); return; }
     const opts=[["peek",s.peek],["half",s.half],["full",s.full]]; let best=opts[0], bd=1e9;
