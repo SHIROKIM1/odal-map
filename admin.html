@@ -262,14 +262,14 @@ window.GEO_DATA = {
   .meDot{width:13px;height:13px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 4px rgba(26,115,232,.3);}
   .leaflet-tooltip.lmtip.me{background:#1a73e8;}
   .leaflet-control.mapbtns{margin-bottom:12px;margin-right:12px;}
-  .mybtn{width:42px;height:42px;border-radius:11px;background:#fff;border:1px solid #d3dae0;box-shadow:0 2px 8px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--sub);}
+  .mybtn{width:52px;height:52px;border-radius:50%;background:#fff;border:none;box-shadow:0 2px 10px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#5f6368;}
   .mybtn:active{background:#f1f3f5;}
-  .mybtn.on{color:#1a73e8;border-color:#1a73e8;}
-  .mybtn svg{width:21px;height:21px;}
-  .leaflet-control-zoom{border:1px solid #d3dae0 !important;box-shadow:0 2px 8px rgba(0,0,0,.18) !important;border-radius:11px !important;overflow:hidden;margin-right:12px !important;}
-  .leaflet-control-zoom a{width:42px !important;height:42px !important;line-height:42px !important;color:var(--sub) !important;font-size:20px !important;background:#fff !important;border-bottom:1px solid #e6e9ec !important;}
+  .mybtn.on{color:#1a73e8;}
+  .mybtn svg{width:24px;height:24px;}
+  .leaflet-control-zoom{border:none !important;box-shadow:0 2px 10px rgba(0,0,0,.22) !important;border-radius:14px !important;overflow:hidden;margin-right:12px !important;}
+  .leaflet-control-zoom a{width:44px !important;height:44px !important;line-height:44px !important;color:#5f6368 !important;font-size:20px !important;background:#fff !important;border-bottom:1px solid #eceef0 !important;}
   .leaflet-control-zoom a:last-child{border-bottom:none !important;}
-  .leaflet-bottom.leaflet-right{margin-bottom:env(safe-area-inset-bottom);}
+  .leaflet-bottom.leaflet-right{margin-bottom:env(safe-area-inset-bottom);transition:bottom .22s ease, opacity .18s ease;}
 
   @media (max-width:760px){
     #topbar{padding:6px 12px;padding-top:calc(6px + env(safe-area-inset-top));gap:8px;}
@@ -292,6 +292,14 @@ window.GEO_DATA = {
   /* 하단 토스트 알림 */
   #toast{position:fixed;left:50%;bottom:calc(28px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(12px);background:#2b313a;color:#fff;font-size:13.5px;font-weight:700;padding:12px 18px;border-radius:12px;box-shadow:0 6px 22px rgba(0,0,0,.3);max-width:88vw;text-align:center;line-height:1.45;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:9000;}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* 모바일: 필터 칩 지도 상단 오버레이 (구글맵 스타일 플로팅 칩) */
+  #fbarTop{position:absolute;top:10px;left:0;right:0;z-index:800;padding:0 10px;}
+  #fbarTop:empty{display:none;}
+  #fbarTop .fbar{display:flex;gap:7px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 2px 8px;}
+  #fbarTop .fbar::-webkit-scrollbar{display:none;}
+  #fbarTop .fchip{background:#fff;border:none;box-shadow:0 1px 6px rgba(0,0,0,.22);flex:0 0 auto;}
+  #fbarTop .fchip.on{background:#fdf2f8;box-shadow:0 1px 6px rgba(170,17,102,.35);color:var(--accent);}
 
 </style>
 </head>
@@ -423,6 +431,8 @@ function setSel(id, on){
     if(dest && te.parentNode !== dest) dest.appendChild(te);
   } }
   markers[id].setZIndexOffset(on ? 3000 : 0);
+  /* 풀네임/상세로 크기가 바뀌므로 툴팁 위치를 재계산 (안 하면 핀과 어긋남) */
+  if(tt){ requestAnimationFrame(()=>{ try{ tt.update(); }catch(e){} }); }
 }
 function deselect(){
   if(!selectedId) return;
@@ -619,10 +629,28 @@ D.landmarks.forEach(l=>{
   const handle = document.getElementById("sheetHandle");
   const bodyEl = document.getElementById("body");
   function bodyH(){ return (bodyEl ? bodyEl.clientHeight : window.innerHeight) || 500; }
-  function snaps(){ const h=bodyH(); return { peek:100, half:Math.round(h*0.5), full:Math.round(h*0.86) }; }
+  /* 시트 기본 노출(peek)을 더 넓게 */
+  function snaps(){ const h=bodyH(); return { peek:Math.max(150, Math.round(h*0.22)), half:Math.round(h*0.5), full:Math.round(h*0.86) }; }
   let cur = "peek";
-  function setSheet(state, px){ const s=snaps(); let h = (px!=null) ? px : s[state]; h=Math.max(s.peek, Math.min(s.full, h)); panelEl.style.height=h+"px"; if(px==null && state) cur=state; }
-  function applyMobile(){ if(mq.matches){ panelEl.classList.add("sheet"); setSheet("peek"); } else { panelEl.classList.remove("sheet"); panelEl.style.height=""; panelEl.style.transition=""; } setTimeout(function(){ map.invalidateSize(false); }, 60); }
+  /* 지도 우하단 컨트롤(내위치·확대축소)을 시트 높이만큼 띄워 가려지지 않게. 시트가 60% 넘게 올라오면 잠시 숨김 */
+  function placeCtls(h){
+    const c = document.querySelector(".leaflet-bottom.leaflet-right"); if(!c) return;
+    if(!mq.matches){ c.style.bottom=""; c.style.opacity=""; c.style.pointerEvents=""; return; }
+    if(h > bodyH()*0.6){ c.style.opacity="0"; c.style.pointerEvents="none"; }
+    else { c.style.opacity="1"; c.style.pointerEvents=""; c.style.bottom=(h+10)+"px"; }
+  }
+  function setSheet(state, px){ const s=snaps(); let h = (px!=null) ? px : s[state]; h=Math.max(s.peek, Math.min(s.full, h)); panelEl.style.height=h+"px"; if(px==null && state) cur=state; placeCtls(h); }
+  /* 모바일에선 필터 칩을 시트에서 꺼내 지도 상단 오버레이로 이동 (데스크톱은 원위치) */
+  const fbarTop = L.DomUtil.create("div","", map.getContainer()); fbarTop.id="fbarTop";
+  L.DomEvent.disableClickPropagation(fbarTop); L.DomEvent.disableScrollPropagation(fbarTop);
+  function placeFbar(){
+    const fb = document.getElementById("fbar");
+    const pt = panelEl.querySelector(".ptop");
+    if(!fb || !pt) return;
+    if(mq.matches){ if(fb.parentNode!==fbarTop) fbarTop.appendChild(fb); pt.style.display="none"; }
+    else { if(fb.parentNode!==pt) pt.appendChild(fb); pt.style.display=""; }
+  }
+  function applyMobile(){ placeFbar(); if(mq.matches){ panelEl.classList.add("sheet"); setSheet("peek"); } else { panelEl.classList.remove("sheet"); panelEl.style.height=""; panelEl.style.transition=""; placeCtls(0); } setTimeout(function(){ map.invalidateSize(false); }, 60); }
   applyMobile();
   if(mq.addEventListener) mq.addEventListener("change", applyMobile); else if(mq.addListener) mq.addListener(applyMobile);
   window.addEventListener("resize", function(){ if(mq.matches) setSheet(cur); });
@@ -660,7 +688,7 @@ function fitAll(){
     const panelEl = document.getElementById("panel");
     if(panelEl && panelEl.classList.contains("sheet")){
       /* 모바일 첫 화면: 좌·하단 여백을 더 크게 → 핀 묶음이 살짝 오른쪽·위로 치우침 */
-      map.fitBounds(L.latLngBounds(pts), { paddingTopLeft:[58,24], paddingBottomRight:[22,86], maxZoom:15, animate:false });
+      map.fitBounds(L.latLngBounds(pts), { paddingTopLeft:[58,60], paddingBottomRight:[22,Math.max(170, Math.round((document.getElementById("body")?.clientHeight||600)*0.24))], maxZoom:15, animate:false });
     } else {
       map.fitBounds(L.latLngBounds(pts), { padding:[45,45], maxZoom:15, animate:false });
     }
